@@ -53,7 +53,7 @@ Package parameters: PHP `["8.4", "8.5"]`, `run-integration: false`, codecov + in
   `webinertia/webware-tools/.github/workflows/continuous-integration.yml@0.1.x` with
   `secrets: inherit` and inputs: `php-versions: '["8.4", "8.5"]'`, `run-integration: false`,
   `enable-codecov: true`, `enable-infection: true`, `coverage-php-version: 8.5`,
-  `min-msi: 95`, `min-covered-msi: 95`
+  `min-msi: 0`, `min-covered-msi: 0` (raise toward 95 as the test suite matures)
 - [ ] T016 Create `.github/copilot-instructions.md` with PHPUnit 13 mock-vs-stub and coverage
   metadata rules
 - [ ] T017 Add `/.specify/` and `/specs/` to `.gitattributes` `export-ignore` so spec-kit

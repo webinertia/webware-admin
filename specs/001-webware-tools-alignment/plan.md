@@ -32,7 +32,8 @@ with Mago as static analysis tool
 **Performance Goals**: N/A
 
 **Constraints**: CI matrix `["8.4", "8.5"]`; `config.platform.php` = `8.4.99`; `run-integration`
-= `false` (no integration suite yet); `min-msi` and `min-covered-msi` = 95
+= `false` (no integration suite yet); `min-msi` and `min-covered-msi` = 0 (fresh import, raise
+toward 95 as the test suite matures)
 
 **Scale/Scope**: Tooling alignment only (test scaffolding, not full coverage)
 

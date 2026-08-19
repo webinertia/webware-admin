@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Webware\Admin\RequestHandler;
 
+use Laminas\Diactoros\Exception\InvalidArgumentException;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Mezzio\Template\TemplateRendererInterface;
 use Override;
@@ -18,6 +19,9 @@ final class DashboardHandler implements RequestHandlerInterface
         private readonly TemplateRendererInterface $template,
     ) {}
 
+    /**
+     * @throws InvalidArgumentException
+     */
     #[Override]
     public function handle(ServerRequestInterface $request): ResponseInterface
     {

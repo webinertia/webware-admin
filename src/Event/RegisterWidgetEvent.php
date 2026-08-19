@@ -20,11 +20,6 @@ final class RegisterWidgetEvent
     /** @var WidgetInterface[] */
     private array $widgets = [];
 
-    public function registerWidget(WidgetInterface $widget): void
-    {
-        $this->widgets[] = $widget;
-    }
-
     /**
      * Returns an ArrayIterator of widgets sorted by ascending order value.
      *
@@ -33,8 +28,13 @@ final class RegisterWidgetEvent
     public function getIterator(): ArrayIterator
     {
         $widgets = $this->widgets;
-        usort($widgets, static fn (WidgetInterface $a, WidgetInterface $b): int => $a->order <=> $b->order);
+        usort($widgets, static fn(WidgetInterface $a, WidgetInterface $b): int => $a->order <=> $b->order);
 
         return new ArrayIterator($widgets);
+    }
+
+    public function registerWidget(WidgetInterface $widget): void
+    {
+        $this->widgets[] = $widget;
     }
 }
