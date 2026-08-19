@@ -29,5 +29,5 @@ jobs:
       coverage-php-version: "8.5"
       # Fresh import — suite not built out yet. Raise toward 95 as the test
       # suite matures.
-      min-msi: "0"
-      min-covered-msi: "0"
+      min-msi: "15"
+      min-covered-msi: "15"
