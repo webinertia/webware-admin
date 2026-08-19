@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Webware\Admin;
 
+use Mezzio\Exception\InvalidMiddlewareException;
 use Mezzio\MiddlewareFactoryInterface;
 use Mezzio\Router\RouteCollectorInterface;
 use Mezzio\Router\RouteProviderInterface;
@@ -17,20 +18,23 @@ final readonly class RouteProvider implements RouteProviderInterface
         private string $routeNamePrefix,
     ) {}
 
+    /**
+     * @throws InvalidMiddlewareException
+     */
     #[Override]
     public function registerRoutes(
         RouteCollectorInterface $routeCollector,
         MiddlewareFactoryInterface $middlewareFactory,
     ): void {
         $routeCollector->get(
-            '/' . $this->adminBasePath,
+            "/{$this->adminBasePath}",
             $middlewareFactory->prepare(
                 [
                     DashboardMiddleware::class,
                     RequestHandler\DashboardHandler::class,
-                ]
+                ],
             ),
-            $this->routeNamePrefix . 'dashboard.read'
+            "{$this->routeNamePrefix}dashboard.read",
         )->setOptions([
             'navigation' => 'admin',
             'label'      => 'Dashboard',

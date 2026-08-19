@@ -15,67 +15,7 @@ use Webware\Admin\View\Helper\AdminUrlFactory;
 
 final readonly class ConfigProvider
 {
-    public function __invoke(): array
-    {
-        return [
-            'dependencies'        => $this->getDependencies(),
-            'router'              => $this->getRouteProviders(),
-            'templates'           => $this->getTemplates(),
-            'view_helpers'        => $this->getViewHelpers(),
-            AclInterface::class   => $this->getAclConfig(),
-            AdminInterface::class => $this->getDefaultConfig(),
-        ];
-    }
-
-    public function getDependencies(): array
-    {
-        return [
-            'factories' => [
-                DashboardHandler::class    => DashboardHandlerFactory::class,
-                DashboardMiddleware::class => DashboardMiddlewareFactory::class,
-                RouteProvider::class       => RouteProviderFactory::class,
-            ],
-        ];
-    }
-
-    public function getDefaultConfig(): array
-    {
-        return [
-            Container\Configuration::ADMIN_ROUTE_SEGMENT_KEY     => Container\Configuration::ADMIN_ROUTE_SEGMENT_VALUE,
-            Container\Configuration::ADMIN_ROUTE_NAME_PREFIX_KEY => Container\Configuration::ADMIN_ROUTE_NAME_PREFIX_VALUE,
-        ];
-    }
-
-    public function getTemplates(): array
-    {
-        return [
-            'paths' => [
-                'admin' => [__DIR__ . '/../templates/admin'],
-            ],
-        ];
-    }
-
-    public function getViewHelpers(): array
-    {
-        return [
-            'aliases'   => [
-                'adminUrl' => AdminUrl::class,
-            ],
-            'factories' => [
-                AdminUrl::class => AdminUrlFactory::class,
-            ],
-        ];
-    }
-
-    public function getRouteProviders(): array
-    {
-        return [
-            'route-providers' => [
-                RouteProvider::class,
-            ],
-        ];
-    }
-
+    /** @return array<string, mixed> */
     public function getAclConfig(): array
     {
         return [
@@ -90,6 +30,73 @@ final readonly class ConfigProvider
                     Container\Configuration::ADMIN_ROUTE_NAME_PREFIX_VALUE . 'dashboard.read' => [],
                 ],
             ],
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    public function getDefaultConfig(): array
+    {
+        return [
+            Container\Configuration::ADMIN_ROUTE_SEGMENT_KEY     => Container\Configuration::ADMIN_ROUTE_SEGMENT_VALUE,
+            Container\Configuration::ADMIN_ROUTE_NAME_PREFIX_KEY => Container\Configuration::ADMIN_ROUTE_NAME_PREFIX_VALUE,
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    public function getDependencies(): array
+    {
+        return [
+            'factories' => [
+                DashboardHandler::class    => DashboardHandlerFactory::class,
+                DashboardMiddleware::class => DashboardMiddlewareFactory::class,
+                RouteProvider::class       => RouteProviderFactory::class,
+            ],
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    public function getRouteProviders(): array
+    {
+        return [
+            'route-providers' => [
+                RouteProvider::class,
+            ],
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    public function getTemplates(): array
+    {
+        return [
+            'paths' => [
+                'admin' => [__DIR__ . '/../templates/admin'],
+            ],
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    public function getViewHelpers(): array
+    {
+        return [
+            'aliases'   => [
+                'adminUrl' => AdminUrl::class,
+            ],
+            'factories' => [
+                AdminUrl::class => AdminUrlFactory::class,
+            ],
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    public function __invoke(): array
+    {
+        return [
+            'dependencies'        => $this->getDependencies(),
+            'router'              => $this->getRouteProviders(),
+            'templates'           => $this->getTemplates(),
+            'view_helpers'        => $this->getViewHelpers(),
+            AclInterface::class   => $this->getAclConfig(),
+            AdminInterface::class => $this->getDefaultConfig(),
         ];
     }
 }

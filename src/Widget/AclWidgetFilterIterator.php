@@ -6,6 +6,7 @@ namespace Webware\Admin\Widget;
 
 use FilterIterator;
 use Iterator;
+use Override;
 use Webware\Acl\AclInterface;
 use Webware\UserManager\UserInterface;
 
@@ -18,7 +19,7 @@ use Webware\UserManager\UserInterface;
 final class AclWidgetFilterIterator extends FilterIterator
 {
     /**
-     * @param Iterator<int, WidgetInterface> $iterator
+     * @param Iterator $iterator
      */
     public function __construct(
         Iterator $iterator,
@@ -28,11 +29,12 @@ final class AclWidgetFilterIterator extends FilterIterator
         parent::__construct($iterator);
     }
 
+    #[Override]
     public function accept(): bool
     {
         $widget = $this->current();
 
-        if (! $widget instanceof WidgetInterface) {
+        if (! $widget instanceof WidgetInterface || null === $this->user) {
             return false;
         }
 

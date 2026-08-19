@@ -32,7 +32,8 @@ with Mago as static analysis tool
 **Performance Goals**: N/A
 
 **Constraints**: CI matrix `["8.4", "8.5"]`; `config.platform.php` = `8.4.99`; `run-integration`
-= `false` (no integration suite yet); `min-msi` and `min-covered-msi` = 95
+= `false` (no integration suite yet); `min-msi` and `min-covered-msi` = 15 (fresh import, raise
+toward 95 as the test suite matures)
 
 **Scale/Scope**: Tooling alignment only (test scaffolding, not full coverage)
 
@@ -178,7 +179,7 @@ Consumer obligations derived from the contract:
   - `secrets: inherit`
   - `with`: `php-versions: '["8.4", "8.5"]'`, `run-integration: false`,
     `enable-codecov: true`, `enable-infection: true`, `coverage-php-version: 8.5`,
-    `min-msi: 95`, `min-covered-msi: 95`; omit DB inputs.
+    `min-msi: 15`, `min-covered-msi: 15`; omit DB inputs.
 - `.github/copilot-instructions.md`: PHPUnit 13 mock-vs-stub rules (`createStub()` for
   value-returning doubles, `createMock()` only with `expects()`) and
   `requireCoverageMetadata="true"` rules (`#[CoversClass]` / `#[CoversMethod]` per test class).

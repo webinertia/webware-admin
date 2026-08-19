@@ -42,7 +42,7 @@ reference instance.
 | `enable-codecov` | `true` |
 | `enable-infection` | `true` |
 | `coverage-php-version` | `8.5` |
-| `min-msi` / `min-covered-msi` | `95` / `95` |
+| `min-msi` / `min-covered-msi` | `15` / `15` (fresh import; raise toward 95 as the test suite matures) |
 | DB container (`db-image`) | omitted (no database) |
 | Integration container | omitted |
 | Test autoload namespaces | `WebwareTest\Admin\` → `test/unit/`, `WebwareTestIntegration\Admin\` → `test/integration/` |

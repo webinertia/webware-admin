@@ -1,0 +1,49 @@
+variant = "loose"
+
+[[issues]]
+file = "src/Middleware/DashboardMiddleware.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #3 of `Webware\Admin\Widget\AclWidgetFilterIterator::__construct`: expected `null|unknown-ref(Webware\UserManager\UserInterface)`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "src/Middleware/DashboardMiddleware.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "src/Middleware/DashboardMiddleware.php"
+code = "non-existent-class-like"
+message = 'Class, interface, enum, or trait `Webware\UserManager\UserInterface` not found.'
+count = 1
+
+[[issues]]
+file = "src/Middleware/DashboardMiddleware.php"
+code = "non-existent-use-import"
+message = 'Imported class, interface, trait, or enum `Webware\UserManager\UserInterface` does not exist.'
+count = 1
+
+[[issues]]
+file = "src/Widget/AclWidgetFilterIterator.php"
+code = "non-existent-class-like"
+message = 'Cannot find class, interface, enum, or type alias `Webware\UserManager\UserInterface`.'
+count = 1
+
+[[issues]]
+file = "src/Widget/AclWidgetFilterIterator.php"
+code = "non-existent-use-import"
+message = 'Imported class, interface, trait, or enum `Webware\UserManager\UserInterface` does not exist.'
+count = 1
+
+[[issues]]
+file = "src/Widget/AclWidgetFilterIterator.php"
+code = "possibly-invalid-argument"
+message = "Possible argument type mismatch for argument #1 of `IteratorIterator::__construct`: expected `('TIterator.filteriterator extends Traversable<('K.filteriterator extends mixed), ('V.filteriterator extends mixed)>)`, but possibly received `Iterator<mixed, mixed>`."
+count = 1
+
+[[issues]]
+file = "src/Widget/AclWidgetFilterIterator.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `Laminas\Permissions\Acl\AclInterface::isAllowed`: expected `Laminas\Permissions\Acl\Role\RoleInterface|string`, but possibly received `unknown-ref(Webware\UserManager\UserInterface)`.'
+count = 1

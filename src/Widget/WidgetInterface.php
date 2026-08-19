@@ -12,6 +12,8 @@ use Laminas\Permissions\Acl\Resource\ResourceInterface;
  * Implementing classes must provide a get hook for each property.
  * The resource and privilege are used by AclWidgetFilterIterator to
  * determine whether the current user may see this widget.
+ *
+ * @api
  */
 interface WidgetInterface extends ResourceInterface
 {
