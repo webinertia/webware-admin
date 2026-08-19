@@ -1,0 +1,14 @@
+<?php $this->headTitle('Admin Dashboard'); ?>
+
+<!-- Page header -->
+<div class="mb-3">
+    <h1 class="h4 fw-bold mb-0">Admin Dashboard</h1>
+    <p class="text-secondary small mb-0">Application management</p>
+</div>
+
+<!-- Widget grid -->
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+    <?php foreach ($this->widgets as $widget): ?>
+        <?= $this->partial($widget->template, $widget) ?>
+    <?php endforeach; ?>
+</div>
