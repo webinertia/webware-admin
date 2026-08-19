@@ -6,3 +6,6 @@
 /summary.log
 /vendor/
 /.vscode/
+
+/.specify/
+/specs/
