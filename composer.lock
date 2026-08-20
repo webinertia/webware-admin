@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "803818c62e687a339956a926bb7e0bee",
+    "content-hash": "1f36eee16dacf9b2670d92793e717c88",
     "packages": [
         {
             "name": "brick/math",
@@ -1740,16 +1740,16 @@
         },
         {
             "name": "mezzio/mezzio-template",
-            "version": "2.13.0",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mezzio/mezzio-template.git",
-                "reference": "ad72bb31036d0639a5c5a502af234217faf6932f"
+                "reference": "49a797e19b167b208327854c81eb079937f0b161"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mezzio/mezzio-template/zipball/ad72bb31036d0639a5c5a502af234217faf6932f",
-                "reference": "ad72bb31036d0639a5c5a502af234217faf6932f",
+                "url": "https://api.github.com/repos/mezzio/mezzio-template/zipball/49a797e19b167b208327854c81eb079937f0b161",
+                "reference": "49a797e19b167b208327854c81eb079937f0b161",
                 "shasum": ""
             },
             "require": {
@@ -1800,7 +1800,7 @@
                     "type": "community_bridge"
                 }
             ],
-            "time": "2025-10-11T08:45:28+00:00"
+            "time": "2025-10-11T09:18:27+00:00"
         },
         {
             "name": "monolog/monolog",
