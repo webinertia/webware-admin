@@ -3403,12 +3403,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webinertia/webware-acl.git",
-                "reference": "efc05aba937e349826952e09769ea3b298e35500"
+                "reference": "6fa6b43c834485e06b1305fa0198d21f4216861b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webinertia/webware-acl/zipball/efc05aba937e349826952e09769ea3b298e35500",
-                "reference": "efc05aba937e349826952e09769ea3b298e35500",
+                "url": "https://api.github.com/repos/webinertia/webware-acl/zipball/6fa6b43c834485e06b1305fa0198d21f4216861b",
+                "reference": "6fa6b43c834485e06b1305fa0198d21f4216861b",
                 "shasum": ""
             },
             "require": {
@@ -3417,9 +3417,9 @@
                 "laminas/laminas-permissions-acl": "^2.16",
                 "mezzio/mezzio": "^3.26",
                 "mezzio/mezzio-authentication": "^1.13",
-                "mezzio/mezzio-router": "^3.15",
+                "mezzio/mezzio-router": "^3.15 || ^4.0",
                 "mezzio/mezzio-session": "^1.12",
-                "mezzio/mezzio-template": "^2.8",
+                "mezzio/mezzio-template": "^2.8 || ^3.0",
                 "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 || ~8.6.0",
                 "php-db/phpdb-mysql": "^0.5.x-dev",
                 "php-standard-library/type": "^6.2",
@@ -3474,7 +3474,7 @@
                 "source": "https://github.com/webinertia/webware-acl/tree/0.1.x",
                 "issues": "https://github.com/webinertia/webware-acl/issues"
             },
-            "time": "2026-08-19T00:51:08+00:00"
+            "time": "2026-08-19T22:27:38+00:00"
         },
         {
             "name": "webware/webware-core",
