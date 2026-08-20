@@ -24,7 +24,7 @@
         "mezzio/mezzio-authentication": "^1.13",
         "mezzio/mezzio-helpers": "^5.0",
         "mezzio/mezzio-router": "^3.15 || ^4.0",
-        "mezzio/mezzio-template": "^2.8",
+        "mezzio/mezzio-template": "^2.8 || ^3.0",
         "php-standard-library/type": "^6.2",
         "psr/container": "^2.0",
         "psr/event-dispatcher": "^1.0",
