@@ -12,6 +12,8 @@ use Webware\Admin\RequestHandler\DashboardHandler;
 use Webware\Admin\View\Helper\AdminUrl;
 use Webware\Admin\View\Helper\AdminUrlFactory;
 
+use function dirname;
+
 /**
  * @type AclConfig = array{
  *   roles: array<string, list<string>>,
@@ -110,7 +112,7 @@ final readonly class ConfigProvider
     {
         return [
             'paths' => [
-                'admin' => [__DIR__ . '/../templates/admin'],
+                'admin' => [dirname(__DIR__) . '/templates/admin'],
             ],
         ];
     }

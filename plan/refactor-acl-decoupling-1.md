@@ -112,7 +112,7 @@ Full design context: <https://github.com/webinertia/webware-admin/issues/12>
 - **TEST-001**: `AclWidgetFilterIteratorTest` (re-enabled, no skips): laminas `AclInterface` stubs + `Laminas\Permissions\Acl\Role\GenericRole` user — accepts when allowed, filters partially allowed, rejects non-widgets, rejects when denied, denies all with a null user (fail closed).
 - **TEST-002**: `DashboardMiddlewareTest` (new): allowed widgets attached to the `RegisterWidgetEvent::class` attribute; denied widgets filtered; missing user ⇒ empty iterator; non-`RoleInterface` user (`Mezzio\Authentication\DefaultUser`) ⇒ empty iterator (fail closed).
 - **TEST-003**: `DashboardMiddlewareIntegrationTest` (new, DB-free): real `PhpSession` adapter authenticates a session-bound dual-interface user (Mezzio `UserInterface` + laminas `RoleInterface`), then a real `Laminas\Permissions\Acl\Acl` drives `DashboardMiddleware` — Administrator sees the widget, Member sees none.
-- **TEST-004**: `ConfigProviderIntegrationTest`: assert the `mezzio-authorization-acl` defaults (roles `User`/`Administrator`, resource/allow = `webware.admin.dashboard.read`) and that no `Laminas\Permissions\Acl\AclInterface::class` service definition is registered.
+- **TEST-004**: `ConfigProviderIntegrationTest`: assert the `mezzio-authorization-acl` defaults (roles `User`/`Administrator`, resource/allow = `webware.admin.dashboard.read`), assert every getter and `__invoke()` return their exact expected shape via `TestAssets\ExpectedConfig` (kills `ArrayItemRemoval` mutants), and assert that no `Laminas\Permissions\Acl\AclInterface::class` service definition is registered.
 - **TEST-005**: Full CI matrix (mago, unit lowest/locked/latest, coverage, infection) green in both repos.
 
 ## 7. Risks & Assumptions

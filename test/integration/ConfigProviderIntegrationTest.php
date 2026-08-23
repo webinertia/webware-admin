@@ -6,14 +6,32 @@ namespace WebwareTestIntegration\Admin;
 
 use Laminas\Permissions\Acl\AclInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Webware\Admin\ConfigProvider;
-use Webware\Admin\Container\Configuration;
+use WebwareTestIntegration\Admin\TestAssets\ExpectedConfig;
 
 #[CoversClass(ConfigProvider::class)]
+#[CoversMethod(ConfigProvider::class, '__invoke')]
+#[CoversMethod(ConfigProvider::class, 'getAclConfig')]
+#[CoversMethod(ConfigProvider::class, 'getDefaultConfig')]
+#[CoversMethod(ConfigProvider::class, 'getDependencies')]
+#[CoversMethod(ConfigProvider::class, 'getRouteProviders')]
+#[CoversMethod(ConfigProvider::class, 'getTemplates')]
+#[CoversMethod(ConfigProvider::class, 'getViewHelpers')]
 final class ConfigProviderIntegrationTest extends TestCase
 {
+    #[Test]
+    public function configProviderCanBeInvokedMultipleTimes(): void
+    {
+        $configProvider = new ConfigProvider();
+        $config1        = $configProvider();
+        $config2        = $configProvider();
+
+        static::assertSame($config1, $config2);
+    }
+
     #[Test]
     public function configProviderDoesNotRegisterTheAclService(): void
     {
@@ -26,29 +44,44 @@ final class ConfigProviderIntegrationTest extends TestCase
     }
 
     #[Test]
-    public function configProviderProvidesMezzioAclDefaultsForTheAdminRoutes(): void
+    public function getAclConfigReturnsExpectedConfig(): void
     {
-        $config = (new ConfigProvider())();
-
-        self::assertArrayHasKey('mezzio-authorization-acl', $config);
-
-        $aclConfig = $config['mezzio-authorization-acl'];
-        $dashboard = Configuration::ADMIN_ROUTE_NAME_PREFIX_VALUE . 'dashboard.read';
-
-        // Matches the structure consumed by mezzio/mezzio-authorization-acl:
-        // resources are the route names registered by the admin RouteProvider.
-        self::assertSame(['User' => [], 'Administrator' => ['User']], $aclConfig['roles']);
-        self::assertSame([$dashboard], $aclConfig['resources']);
-        self::assertSame(['Administrator' => [$dashboard]], $aclConfig['allow']);
+        static::assertSame(ExpectedConfig::getExpectedAclConfig(), new ConfigProvider()->getAclConfig());
     }
 
     #[Test]
-    public function configProviderReturnsExpectedTopLevelKeys(): void
+    public function getDefaultConfigReturnsExpectedConfig(): void
     {
-        $config = (new ConfigProvider())();
+        static::assertSame(ExpectedConfig::getExpectedDefaultConfig(), new ConfigProvider()->getDefaultConfig());
+    }
 
-        self::assertArrayHasKey('dependencies', $config);
-        self::assertArrayHasKey('templates', $config);
-        self::assertArrayHasKey('view_helpers', $config);
+    #[Test]
+    public function getDependenciesReturnsExpectedConfig(): void
+    {
+        static::assertSame(ExpectedConfig::getExpectedDependencies(), new ConfigProvider()->getDependencies());
+    }
+
+    #[Test]
+    public function getRouteProvidersReturnsExpectedConfig(): void
+    {
+        static::assertSame(ExpectedConfig::getExpectedRouteProviders(), new ConfigProvider()->getRouteProviders());
+    }
+
+    #[Test]
+    public function getTemplatesReturnsExpectedConfig(): void
+    {
+        static::assertSame(ExpectedConfig::getExpectedTemplates(), new ConfigProvider()->getTemplates());
+    }
+
+    #[Test]
+    public function getViewHelpersReturnsExpectedConfig(): void
+    {
+        static::assertSame(ExpectedConfig::getExpectedViewHelpers(), new ConfigProvider()->getViewHelpers());
+    }
+
+    #[Test]
+    public function invokeReturnsExpectedConfig(): void
+    {
+        static::assertSame(ExpectedConfig::getExpectedConfig(), (new ConfigProvider())());
     }
 }
