@@ -12,6 +12,39 @@ use Webware\Admin\RequestHandler\DashboardHandler;
 use Webware\Admin\View\Helper\AdminUrl;
 use Webware\Admin\View\Helper\AdminUrlFactory;
 
+/**
+ * @type AclConfig = array{
+ *   roles: array<string, list<string>>,
+ *   resources: list<string>,
+ *   allow: array<string, list<string>>
+ * }
+ * @type DefaultConfig = array{
+ *   admin_route_segment: string,
+ *   admin_route_name_prefix: string
+ * }
+ * @type Dependencies = array{
+ *   factories: array<class-string, class-string>
+ * }
+ * @type RouteProviders = array{
+ *   route-providers: list<class-string>
+ * }
+ * @type Templates = array{
+ *   paths: array<string, list<string>>
+ * }
+ * @type ViewHelpers = array{
+ *   aliases: array<string, class-string>,
+ *   factories: array<class-string, class-string>
+ * }
+ * @type ProviderConfig = array{
+ *   dependencies: Dependencies,
+ *   router: RouteProviders,
+ *   templates: Templates,
+ *   view_helpers: ViewHelpers,
+ *   'mezzio-authorization-acl': AclConfig,
+ *   Webware\Admin\AdminInterface: DefaultConfig
+ * }
+ * @internal
+ */
 final readonly class ConfigProvider
 {
     /**
@@ -21,7 +54,7 @@ final readonly class ConfigProvider
      * not consume this config (it is database driven); host applications using
      * laminas-permissions-acl merge it with their own via the config aggregator.
      *
-     * @return array<string, mixed>
+     * @return AclConfig
      */
     public function getAclConfig(): array
     {
@@ -41,7 +74,7 @@ final readonly class ConfigProvider
         ];
     }
 
-    /** @return array<string, mixed> */
+    /** @return DefaultConfig */
     public function getDefaultConfig(): array
     {
         return [
@@ -50,7 +83,7 @@ final readonly class ConfigProvider
         ];
     }
 
-    /** @return array<string, mixed> */
+    /** @return Dependencies */
     public function getDependencies(): array
     {
         return [
@@ -62,7 +95,7 @@ final readonly class ConfigProvider
         ];
     }
 
-    /** @return array<string, mixed> */
+    /** @return RouteProviders */
     public function getRouteProviders(): array
     {
         return [
@@ -72,7 +105,7 @@ final readonly class ConfigProvider
         ];
     }
 
-    /** @return array<string, mixed> */
+    /** @return Templates */
     public function getTemplates(): array
     {
         return [
@@ -82,7 +115,7 @@ final readonly class ConfigProvider
         ];
     }
 
-    /** @return array<string, mixed> */
+    /** @return ViewHelpers */
     public function getViewHelpers(): array
     {
         return [
@@ -95,7 +128,7 @@ final readonly class ConfigProvider
         ];
     }
 
-    /** @return array<string, mixed> */
+    /** @return ProviderConfig */
     public function __invoke(): array
     {
         return [
