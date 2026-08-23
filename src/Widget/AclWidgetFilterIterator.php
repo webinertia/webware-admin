@@ -6,13 +6,15 @@ namespace Webware\Admin\Widget;
 
 use FilterIterator;
 use Iterator;
+use Laminas\Permissions\Acl\AclInterface;
+use Laminas\Permissions\Acl\Role\RoleInterface;
 use Override;
-use Webware\Acl\AclInterface;
-use Webware\UserManager\UserInterface;
 
 /**
  * Wraps an iterator of WidgetInterface instances and accepts only those
  * the current user's roles are permitted to see, according to the ACL.
+ *
+ * Fails closed: a null user denies every widget.
  *
  * @extends FilterIterator<int, WidgetInterface, Iterator<int, WidgetInterface>>
  */
@@ -24,7 +26,7 @@ final class AclWidgetFilterIterator extends FilterIterator
     public function __construct(
         Iterator $iterator,
         private readonly AclInterface $acl,
-        private readonly ?UserInterface $user,
+        private readonly ?RoleInterface $user,
     ) {
         parent::__construct($iterator);
     }

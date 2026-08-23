@@ -265,8 +265,8 @@ $app->get('/admin', [
 ## 5. Quality Attributes
 
 ### Security
-- Widget visibility is enforced by the ACL before the handler renders — a module widget is never sent to the template if the current user lacks the required resource/privilege.
-- `WidgetInterface` extends `ResourceInterface`, so widgets are valid ACL resource objects and can be passed directly to `isAllowed()` without string coercion.
+- Widget visibility is enforced by the ACL before the handler renders — a module widget is never sent to the template if the current user lacks the required resource/privilege. Filtering fails closed: without an authenticated, role-aware user, no widgets are shown.
+- `WidgetInterface` extends `ResourceInterface`, and the iterator passes each widget's `resourceId`/`privilege` directly to `isAllowed()` without string coercion.
 
 ### Performance
 - The iterator is lazy — `FilterIterator::accept()` is called only when the template iterates; no up-front array construction of filtered results.
@@ -291,14 +291,16 @@ $app->get('/admin', [
 |---|---|
 | `psr/event-dispatcher` | `EventDispatcherInterface` injected into middleware |
 | `phly/phly-event-dispatcher` | Concrete dispatcher implementation (wired via container) |
-| `webware/webware-acl` | `AclInterface` used by `AclWidgetFilterIterator` |
-| `laminas/laminas-permissions-acl` | `ResourceInterface` extended by `WidgetInterface` |
+| `laminas/laminas-permissions-acl` | `AclInterface` type-hinted by `DashboardMiddleware`/`AclWidgetFilterIterator` (required) |
+| `webware/webware-acl` | Suggested ACL implementation providing the `AclInterface` service, dashboard ACL config, and management UI |
 | `mezzio/mezzio-authentication` | `UserInterface` read from request attribute |
 | `mezzio/mezzio-template` | `TemplateRendererInterface` in `DashboardHandler` |
 
 ### Configuration
 
 No dedicated configuration key. Widgets contribute to `config['listeners']` in their own module `ConfigProvider`.
+
+The consuming application MUST provide a `Laminas\Permissions\Acl\AclInterface` service (e.g. by aliasing it to `webware-acl`'s ACL implementation in its `ConfigProvider`). Without it, the dashboard fails closed at container resolution.
 
 ### Testing
 
@@ -309,5 +311,5 @@ No dedicated configuration key. Widgets contribute to `config['listeners']` in t
 
 ### Related Documentation
 
-- `src/webware-acl/` — ACL resource and privilege registration
+- `webware-acl` package documentation — ACL resource and privilege registration
 - `docs/planning/` — implementation plan phases

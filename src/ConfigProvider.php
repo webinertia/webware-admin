@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Webware\Admin;
 
-use Webware\Acl\AclInterface;
 use Webware\Admin\Container\DashboardHandlerFactory;
 use Webware\Admin\Container\DashboardMiddlewareFactory;
 use Webware\Admin\Container\RouteProviderFactory;
@@ -15,24 +14,6 @@ use Webware\Admin\View\Helper\AdminUrlFactory;
 
 final readonly class ConfigProvider
 {
-    /** @return array<string, mixed> */
-    public function getAclConfig(): array
-    {
-        return [
-            'roles'     => [
-                'Administrator' => ['Member'],
-            ],
-            'resources' => [
-                Container\Configuration::ADMIN_ROUTE_NAME_PREFIX_VALUE . 'dashboard.read' => true,
-            ],
-            'allow'     => [
-                'Administrator' => [
-                    Container\Configuration::ADMIN_ROUTE_NAME_PREFIX_VALUE . 'dashboard.read' => [],
-                ],
-            ],
-        ];
-    }
-
     /** @return array<string, mixed> */
     public function getDefaultConfig(): array
     {
@@ -95,7 +76,6 @@ final readonly class ConfigProvider
             'router'              => $this->getRouteProviders(),
             'templates'           => $this->getTemplates(),
             'view_helpers'        => $this->getViewHelpers(),
-            AclInterface::class   => $this->getAclConfig(),
             AdminInterface::class => $this->getDefaultConfig(),
         ];
     }

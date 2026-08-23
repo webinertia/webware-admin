@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace WebwareTest\Admin;
 
 use ArrayIterator;
+use Laminas\Permissions\Acl\AclInterface;
+use Laminas\Permissions\Acl\Role\GenericRole;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Webware\Acl\AclInterface;
 use Webware\Admin\Widget\AclWidgetFilterIterator;
 use Webware\Admin\Widget\WidgetInterface;
 
@@ -20,8 +21,6 @@ final class AclWidgetFilterIteratorTest extends TestCase
     #[Test]
     public function itAcceptsWidgetWhenAclAllows(): void
     {
-        self::markTestSkipped('Blocked on webware-usermanager split-out (UserInterface typing).');
-
         $widget = $this->makeWidget('admin.acl', 'read');
 
         $acl = $this->createStub(AclInterface::class);
@@ -30,30 +29,45 @@ final class AclWidgetFilterIteratorTest extends TestCase
         $iterator = new AclWidgetFilterIterator(
             new ArrayIterator([$widget]),
             $acl,
-            [AclInterface::DEVELOPER_ROLE_ID],
+            new GenericRole('Administrator'),
         );
 
         self::assertCount(1, iterator_to_array($iterator));
     }
 
     #[Test]
+    public function itDeniesAllWidgetsWhenUserIsNull(): void
+    {
+        $widget = $this->makeWidget('admin.acl', 'read');
+
+        $acl = $this->createMock(AclInterface::class);
+        $acl->expects(self::never())
+            ->method('isAllowed');
+
+        $iterator = new AclWidgetFilterIterator(
+            new ArrayIterator([$widget]),
+            $acl,
+            null,
+        );
+
+        self::assertCount(0, iterator_to_array($iterator));
+    }
+
+    #[Test]
     public function itFiltersPartiallyAllowedWidgets(): void
     {
-        self::markTestSkipped('Blocked on webware-usermanager split-out (UserInterface typing).');
-
         $allowed = $this->makeWidget('admin.dashboard', 'read');
         $denied  = $this->makeWidget('admin.acl', 'read');
 
         $acl = $this->createStub(AclInterface::class);
-        $acl->method('isAllowed')->willReturnMap([
-            [['Administrator'], 'admin.dashboard', 'read', true],
-            [['Administrator'], 'admin.acl', 'read', false],
-        ]);
+        $acl->method('isAllowed')->willReturnCallback(
+            static fn(mixed $role, mixed $resource, mixed $privilege): bool => 'admin.dashboard' === $resource,
+        );
 
         $iterator = new AclWidgetFilterIterator(
             new ArrayIterator([$allowed, $denied]),
             $acl,
-            ['Administrator'],
+            new GenericRole('Administrator'),
         );
 
         $results = iterator_to_array($iterator, preserve_keys: false);
@@ -64,14 +78,13 @@ final class AclWidgetFilterIteratorTest extends TestCase
     #[Test]
     public function itRejectsNonWidgetItems(): void
     {
-        self::markTestSkipped('Blocked on webware-usermanager split-out (UserInterface typing).');
-
-        $acl = $this->createStub(AclInterface::class);
-        $acl->method('isAllowed')->willReturn(true);
+        $acl = $this->createMock(AclInterface::class);
+        $acl->expects(self::never())
+            ->method('isAllowed');
 
         /** @var ArrayIterator<int, mixed> $inner */
         $inner    = new ArrayIterator(['not-a-widget']);
-        $iterator = new AclWidgetFilterIterator($inner, $acl, [AclInterface::DEVELOPER_ROLE_ID]);
+        $iterator = new AclWidgetFilterIterator($inner, $acl, new GenericRole('Administrator'));
 
         self::assertCount(0, iterator_to_array($iterator));
     }
@@ -79,8 +92,6 @@ final class AclWidgetFilterIteratorTest extends TestCase
     #[Test]
     public function itRejectsWidgetWhenAclDenies(): void
     {
-        self::markTestSkipped('Blocked on webware-usermanager split-out (UserInterface typing).');
-
         $widget = $this->makeWidget('admin.acl', 'read');
 
         $acl = $this->createStub(AclInterface::class);
@@ -89,7 +100,7 @@ final class AclWidgetFilterIteratorTest extends TestCase
         $iterator = new AclWidgetFilterIterator(
             new ArrayIterator([$widget]),
             $acl,
-            ['Administrator'],
+            new GenericRole('Administrator'),
         );
 
         self::assertCount(0, iterator_to_array($iterator));
