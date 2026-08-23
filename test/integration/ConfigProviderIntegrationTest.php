@@ -9,19 +9,37 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Webware\Admin\ConfigProvider;
+use Webware\Admin\Container\Configuration;
 
 #[CoversClass(ConfigProvider::class)]
 final class ConfigProviderIntegrationTest extends TestCase
 {
     #[Test]
-    public function configProviderDoesNotOwnTheAclService(): void
+    public function configProviderDoesNotRegisterTheAclService(): void
     {
         $config = (new ConfigProvider())();
 
-        // The ACL implementation is supplied by the consuming application
-        // (e.g. webware-acl aliased to Laminas\Permissions\Acl\AclInterface);
-        // admin must not configure it itself.
+        // The ACL implementation itself is supplied by the consuming
+        // application (e.g. webware-acl aliased to the laminas AclInterface);
+        // admin only ships the authorization rules above.
         self::assertArrayNotHasKey(AclInterface::class, $config);
+    }
+
+    #[Test]
+    public function configProviderProvidesMezzioAclDefaultsForTheAdminRoutes(): void
+    {
+        $config = (new ConfigProvider())();
+
+        self::assertArrayHasKey('mezzio-authorization-acl', $config);
+
+        $aclConfig = $config['mezzio-authorization-acl'];
+        $dashboard = Configuration::ADMIN_ROUTE_NAME_PREFIX_VALUE . 'dashboard.read';
+
+        // Matches the structure consumed by mezzio/mezzio-authorization-acl:
+        // resources are the route names registered by the admin RouteProvider.
+        self::assertSame(['User' => [], 'Administrator' => ['User']], $aclConfig['roles']);
+        self::assertSame([$dashboard], $aclConfig['resources']);
+        self::assertSame(['Administrator' => [$dashboard]], $aclConfig['allow']);
     }
 
     #[Test]

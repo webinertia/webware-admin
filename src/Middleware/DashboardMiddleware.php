@@ -37,6 +37,7 @@ final class DashboardMiddleware implements MiddlewareInterface
         /** @var RegisterWidgetEvent $event */
         $event = $this->dispatcher->dispatch(new RegisterWidgetEvent());
 
+        /** @var UserInterface|null $user */
         $user    = $request->getAttribute(UserInterface::class);
         $widgets = new AclWidgetFilterIterator(
             $event->getIterator(),

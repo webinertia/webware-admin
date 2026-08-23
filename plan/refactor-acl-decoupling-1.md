@@ -54,17 +54,17 @@ Full design context: <https://github.com/webinertia/webware-admin/issues/12>
 |------|-------------|-----------|------|
 | TASK-004 | `src/Container/DashboardMiddlewareFactory.php`: replace `use Webware\Acl\AclInterface;` with `use Laminas\Permissions\Acl\AclInterface;`. Container lookup stays `$container->get(AclInterface::class)` (host app aliases it to its ACL implementation, in practice `Webware\Acl\Acl`). | ✅ | 2026-08-23 |
 | TASK-005 | `src/Middleware/DashboardMiddleware.php`: (a) type-hint the constructor `acl` argument as `Laminas\Permissions\Acl\AclInterface`; (b) read the user from `Mezzio\Authentication\UserInterface::class` instead of `Webware\UserManager\UserInterface`; (c) keep filtering in admin — pass `$user instanceof RoleInterface ? $user : null` to the iterator so non-role-aware users fail closed. | ✅ | 2026-08-23 |
-| TASK-006 | `src/ConfigProvider.php`: delete `getAclConfig()` (lines 19–34), the `AclInterface::class => $this->getAclConfig()` key (line 98), and the `Webware\Acl\AclInterface` import. The ACL config (roles/resources/allow for `admin.dashboard.read`) moves to webware-acl (TASK-009). | ✅ | 2026-08-23 |
+| TASK-006 | `src/ConfigProvider.php`: keep `getAclConfig()` but re-shape it for hosts that use laminas-permissions-acl — emit the default ACL rules under the `mezzio-authorization-acl` config key, matching the structure required by mezzio's integration package (`roles`: `User` + `Administrator => ['User']`; `resources`: the admin dashboard route name `webware.admin.dashboard.read`; `allow`: `Administrator`). Remove only the `Webware\Acl\AclInterface` import and the old `AclInterface::class` config key. webware-acl never consumes this config (it is DB-driven). | ✅ | 2026-08-23 |
 | TASK-007 | `src/Widget/AclWidgetFilterIterator.php`: re-type to `Laminas\Permissions\Acl\AclInterface` and `?Laminas\Permissions\Acl\Role\RoleInterface`; null user denies every widget. The iterator STAYS in admin (REQ-003). | ✅ | 2026-08-23 |
 | TASK-008 | `docs/dashboard-widget-system.md`: update the dependencies table (laminas-permissions-acl is the required `AclInterface`, webware-acl is the suggested implementation), the Configuration section (host app MUST provide an `AclInterface` service), and the security note (filtering fails closed). | ✅ | 2026-08-23 |
 
 ### Implementation Phase 3 — Webware-acl companion (separate repo, separate PR)
 
-- GOAL-003: acl owns the ACL config that admin previously shipped; filtering itself stays in admin.
+- GOAL-003: acl drops its bogus suggest entry and formally requires admin; admin keeps ownership of the laminas-acl default config (acl is DB-driven and never consumes it).
 
 | Task | Description | Completed | Date |
 |------|-------------|-----------|------|
-| TASK-009 | acl `ConfigProvider`: fold admin's former `getAclConfig()` (roles `Administrator => ['Member']`, resource `admin.dashboard.read`, allow `Administrator => [admin.dashboard.read]`) into its existing default config so the dashboard widget permission lives where the ACL is defined. | | |
+| TASK-009 | acl `ConfigProvider`: NO config changes — acl's rules live in its database and are not derived from admin's `mezzio-authorization-acl` defaults. Admin keeps `getAclConfig()` specifically for hosts that use laminas-permissions-acl. | | |
 | TASK-010 | acl `composer.json`: replace the bogus `suggest` entry (lines 41–43, referencing nonexistent `RegisterAclWidgetListener`) with `require: "webware/webware-admin": "0.1.x-dev"` and add the admin VCS repository entry. | | |
 | TASK-011 | acl: ensure its `Acl` implementation satisfies `Laminas\Permissions\Acl\AclInterface` so host apps can alias `Laminas\Permissions\Acl\AclInterface::class => Webware\Acl\Acl::class`. Existing `RegisterWidgetListener` already bridges the event seam — no delegator or extra middleware needed. | | |
 
@@ -80,7 +80,7 @@ Full design context: <https://github.com/webinertia/webware-admin/issues/12>
 
 ## 3. Alternatives
 
-- **ALT-001**: `mezzio-authorization` (mezzio's laminas-acl integration). Rejected — adds dependencies and its string-based `isGranted()` fights webware-acl's object-centric `UserInterface`/assertion design. Research in issue #12.
+- **ALT-001**: `mezzio-authorization` (mezzio's laminas-acl integration) as the filtering seam. Rejected — its string-based `isGranted()` fights webware-acl's object-centric `UserInterface`/assertion design (research in issue #12). Its **config structure** IS adopted for admin's shipped defaults (`mezzio-authorization-acl` key: roles/resources/allow).
 - **ALT-002**: Move `AclWidgetFilterIterator` to webware-acl and have acl re-filter via a delegator or extra middleware. Rejected — filtering must stay in admin so the dashboard fails closed by construction (REQ-003); a delegator also silently breaks admin's fail-closed guarantee if acl is absent.
 - **ALT-003**: Admin-defined `WidgetFilterInterface` service seam with acl providing the implementation. Rejected as over-engineering — the user's directive is a plain laminas type hint.
 
@@ -95,16 +95,16 @@ Full design context: <https://github.com/webinertia/webware-admin/issues/12>
 ## 5. Files
 
 - **FILE-001**: `composer.json` (+ `composer.lock`) — require→suggest, VCS repo removal, mezzio-authentication-session require-dev.
-- **FILE-002**: `src/ConfigProvider.php` — remove `getAclConfig()`, config key, import.
+- **FILE-002**: `src/ConfigProvider.php` — re-shaped `getAclConfig()` (mezzio-authorization-acl structure, roles `User`/`Administrator`, resource = admin dashboard route name); `AclInterface::class` key and `Webware\Acl` import removed.
 - **FILE-003**: `src/Middleware/DashboardMiddleware.php` — laminas type hint, mezzio user attribute, fail-closed RoleInterface bridge, keeps filtering.
 - **FILE-004**: `src/Container/DashboardMiddlewareFactory.php` — laminas import.
 - **FILE-005**: `src/Widget/AclWidgetFilterIterator.php` — re-typed to laminas `AclInterface` + `?RoleInterface`; stays in admin.
 - **FILE-006**: `test/unit/AclWidgetFilterIteratorTest.php` — re-enabled with laminas stubs + `GenericRole` user.
 - **FILE-007**: `test/unit/DashboardMiddlewareTest.php` — NEW: allowed/denied/missing-user/non-role-aware-user cases.
 - **FILE-008**: `test/integration/DashboardMiddlewareIntegrationTest.php` — NEW: real PhpSession + real laminas Acl, no DB (CON-002).
-- **FILE-009**: `test/integration/ConfigProviderIntegrationTest.php` — assert no laminas `AclInterface` config key.
+- **FILE-009**: `test/integration/ConfigProviderIntegrationTest.php` — assert the `mezzio-authorization-acl` defaults (roles/resources/allow for the dashboard route) and no laminas `AclInterface` service definition.
 - **FILE-010**: `docs/dashboard-widget-system.md` — dependency table, configuration note, fail-closed security note.
-- **FILE-011** (acl): `src/ConfigProvider.php` — admin dashboard ACL config ownership.
+- **FILE-011** (acl): no config changes — DB-driven rules only.
 - **FILE-012** (acl): `composer.json` — require admin, VCS repo.
 
 ## 6. Testing
@@ -112,7 +112,7 @@ Full design context: <https://github.com/webinertia/webware-admin/issues/12>
 - **TEST-001**: `AclWidgetFilterIteratorTest` (re-enabled, no skips): laminas `AclInterface` stubs + `Laminas\Permissions\Acl\Role\GenericRole` user — accepts when allowed, filters partially allowed, rejects non-widgets, rejects when denied, denies all with a null user (fail closed).
 - **TEST-002**: `DashboardMiddlewareTest` (new): allowed widgets attached to the `RegisterWidgetEvent::class` attribute; denied widgets filtered; missing user ⇒ empty iterator; non-`RoleInterface` user (`Mezzio\Authentication\DefaultUser`) ⇒ empty iterator (fail closed).
 - **TEST-003**: `DashboardMiddlewareIntegrationTest` (new, DB-free): real `PhpSession` adapter authenticates a session-bound dual-interface user (Mezzio `UserInterface` + laminas `RoleInterface`), then a real `Laminas\Permissions\Acl\Acl` drives `DashboardMiddleware` — Administrator sees the widget, Member sees none.
-- **TEST-004**: `ConfigProviderIntegrationTest`: assert the `Laminas\Permissions\Acl\AclInterface::class` config key is gone.
+- **TEST-004**: `ConfigProviderIntegrationTest`: assert the `mezzio-authorization-acl` defaults (roles `User`/`Administrator`, resource/allow = `webware.admin.dashboard.read`) and that no `Laminas\Permissions\Acl\AclInterface::class` service definition is registered.
 - **TEST-005**: Full CI matrix (mago, unit lowest/locked/latest, coverage, infection) green in both repos.
 
 ## 7. Risks & Assumptions
@@ -121,7 +121,7 @@ Full design context: <https://github.com/webinertia/webware-admin/issues/12>
 - **RISK-002**: `mezzio-authentication-session`'s `PhpSession` expects the mezzio-session `SessionInterface` request attribute; the integration test supplies an in-memory session double — behavior on real `LazySession` persistence is covered by mezzio's own suite.
 - **RISK-003**: Merge-order window where acl requires an admin version that no longer requires acl — coordinate PRs or land Phase 3 first.
 - **ASSUMPTION-001**: The object under the mezzio authentication attribute implements laminas `RoleInterface` in practice (webware-usermanager/webware-acl users do); any other user type fails closed by design.
-- **ASSUMPTION-002**: No other package depends on admin's `getAclConfig()` output or the `AclInterface::class` config key — grep consumers before removal.
+- **ASSUMPTION-002**: Admin's default ACL config targets laminas-permissions-acl hosts via the mezzio-authorization-acl config structure; webware-acl (DB-driven) ignores it. The route name is the resource: `webware.admin.dashboard.read` (prefix constant + `dashboard.read`, as registered by admin's `RouteProvider`).
 
 ## 8. Related Specifications / Further Reading
 

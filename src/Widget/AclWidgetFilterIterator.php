@@ -21,7 +21,7 @@ use Override;
 final class AclWidgetFilterIterator extends FilterIterator
 {
     /**
-     * @param Iterator $iterator
+     * @param Iterator<int, WidgetInterface> $iterator
      */
     public function __construct(
         Iterator $iterator,

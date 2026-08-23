@@ -292,13 +292,33 @@ $app->get('/admin', [
 | `psr/event-dispatcher` | `EventDispatcherInterface` injected into middleware |
 | `phly/phly-event-dispatcher` | Concrete dispatcher implementation (wired via container) |
 | `laminas/laminas-permissions-acl` | `AclInterface` type-hinted by `DashboardMiddleware`/`AclWidgetFilterIterator` (required) |
-| `webware/webware-acl` | Suggested ACL implementation providing the `AclInterface` service, dashboard ACL config, and management UI |
+| `webware/webware-acl` | Suggested ACL implementation providing the `AclInterface` service, database-driven ACL rules, and the management UI |
 | `mezzio/mezzio-authentication` | `UserInterface` read from request attribute |
 | `mezzio/mezzio-template` | `TemplateRendererInterface` in `DashboardHandler` |
 
 ### Configuration
 
-No dedicated configuration key. Widgets contribute to `config['listeners']` in their own module `ConfigProvider`.
+`webware-admin` ships default authorization rules under the `mezzio-authorization-acl` config key, matching the structure consumed by the mezzio integration package for laminas-permissions-acl. The config aggregator merges these defaults with host-app config, so hosts can extend or override them:
+
+```php
+// webware-admin defaults (extract)
+'mezzio-authorization-acl' => [
+    'roles'     => [
+        'User'          => [],
+        'Administrator' => ['User'],
+    ],
+    'resources' => [
+        'webware.admin.dashboard.read', // admin dashboard route name
+    ],
+    'allow'     => [
+        'Administrator' => ['webware.admin.dashboard.read'],
+    ],
+],
+```
+
+In webware the route name is the resource (privileges are encoded in the trailing route-name segment, e.g. `.read`). These defaults are for hosts using laminas-permissions-acl; webware-acl is database-driven and does not consume this config.
+
+Widgets contribute to `config['listeners']` in their own module `ConfigProvider`.
 
 The consuming application MUST provide a `Laminas\Permissions\Acl\AclInterface` service (e.g. by aliasing it to `webware-acl`'s ACL implementation in its `ConfigProvider`). Without it, the dashboard fails closed at container resolution.
 
