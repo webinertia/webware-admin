@@ -28,6 +28,8 @@ Full design context: <https://github.com/webinertia/webware-admin/issues/12>
 - **REQ-002**: `webware/webware-acl` moves from `require` to `suggest` in admin's composer.json; its VCS repository entry is removed.
 - **REQ-003**: Dashboard widget filtering MUST stay in admin. The dashboard can never render unfiltered — the pipeline fails closed: no authenticated role-aware user ⇒ zero widgets; no `AclInterface` service in the container ⇒ container resolution fails ⇒ dashboard errors.
 - **REQ-004**: Widgets MUST be filtered in every environment, including tests. Integration tests exercise the real filter path using a real `Laminas\Permissions\Acl\Acl` instance, with no database requirement.
+- **REQ-005**: Only `WidgetInterface` instances may reach `AclWidgetFilterIterator` — enforced structurally: `WidgetContainer` accepts widgets solely through its typed constructor and `addWidget()`, and there is no other mutation path.
+- **REQ-006**: Widget system classes live in the component root namespace (`Webware\Admin\WidgetInterface`, `Webware\Admin\WidgetContainer`, `Webware\Admin\AclWidgetFilterIterator`) — no `Widget\` sub-namespace duplicating the component name.
 - **CON-001**: `laminas/laminas-permissions-acl: ^2.16` is already a direct admin dependency — the runtime decoupling seam adds no new packages.
 - **CON-002**: `Webware\UserManager\UserInterface` is dropped from admin; the user is read from the standard `Mezzio\Authentication\UserInterface::class` request attribute (`mezzio/mezzio-authentication: ^1.13` is already a direct dependency). For PHPUnit testing without a database, `mezzio/mezzio-authentication-session` is added as a `require-dev` package (session-backed authentication adapter).
 - **CON-003**: PHP `~8.4.1 || ~8.5.0`; PHPUnit 13 strict mode (coverage metadata, mock/stub separation) per the webware constitution.
@@ -58,9 +60,21 @@ Full design context: <https://github.com/webinertia/webware-admin/issues/12>
 | TASK-007 | `src/Widget/AclWidgetFilterIterator.php`: re-type to `Laminas\Permissions\Acl\AclInterface` and `?Laminas\Permissions\Acl\Role\RoleInterface`; null user denies every widget. The iterator STAYS in admin (REQ-003). | ✅ | 2026-08-23 |
 | TASK-008 | `docs/dashboard-widget-system.md`: update the dependencies table (laminas-permissions-acl is the required `AclInterface`, webware-acl is the suggested implementation), the Configuration section (host app MUST provide an `AclInterface` service), and the security note (filtering fails closed). | ✅ | 2026-08-23 |
 
-### Implementation Phase 3 — Webware-acl companion (separate repo, separate PR)
+### Implementation Phase 3 — WidgetContainer type enforcement
 
-- GOAL-003: acl drops its bogus suggest entry and formally requires admin; admin keeps ownership of the laminas-acl default config (acl is DB-driven and never consumes it).
+- GOAL-003: Enforce by construction that only `WidgetInterface` instances can reach `AclWidgetFilterIterator`, and flatten the `Widget\*` classes into the package root.
+
+| Task | Description | Completed | Date |
+|------|-------------|-----------|------|
+| TASK-015 | Move `src/Widget/WidgetInterface.php` → `src/WidgetInterface.php` and `src/Widget/AclWidgetFilterIterator.php` → `src/AclWidgetFilterIterator.php` (namespace `Webware\Admin\Widget` → `Webware\Admin`); delete the empty `src/Widget/` directory. | ✅ | 2026-08-23 |
+| TASK-016 | New `src/WidgetContainer.php`: `final class WidgetContainer implements IteratorAggregate`; `__construct(?WidgetInterface $widget = null)` delegates to `addWidget(WidgetInterface $widget): void`; `addWidget()` appends and `usort`s ascending by `$order` (the ONLY mutation path); `getIterator()` returns a fresh `ArrayIterator` per call. | ✅ | 2026-08-23 |
+| TASK-017 | `src/Event/RegisterWidgetEvent.php`: hold a `WidgetContainer` (constructor-injected, default `new WidgetContainer()`); `registerWidget()` delegates to `addWidget()`; expose `getWidgetContainer(): WidgetContainer`. | ✅ | 2026-08-23 |
+| TASK-018 | `src/AclWidgetFilterIterator.php`: constructor takes `WidgetContainer` directly and passes `$widgets->getIterator()` to `parent::__construct()`; drop the `instanceof WidgetInterface` guard (type safety is structural now); keep null-user fail closed. `DashboardMiddleware` passes `$event->getWidgetContainer()`. | ✅ | 2026-08-23 |
+| TASK-019 | Docs + plan updated for the new API; `analysis-baseline.toml` regenerated (the `IteratorIterator` false positive should disappear). | ✅ | 2026-08-23 |
+
+### Implementation Phase 4 — Webware-acl companion (separate repo, separate PR)
+
+- GOAL-004: acl drops its bogus suggest entry and formally requires admin; admin keeps ownership of the laminas-acl default config (acl is DB-driven and never consumes it).
 
 | Task | Description | Completed | Date |
 |------|-------------|-----------|------|
@@ -68,9 +82,9 @@ Full design context: <https://github.com/webinertia/webware-admin/issues/12>
 | TASK-010 | acl `composer.json`: replace the bogus `suggest` entry (lines 41–43, referencing nonexistent `RegisterAclWidgetListener`) with `require: "webware/webware-admin": "0.1.x-dev"` and add the admin VCS repository entry. | | |
 | TASK-011 | acl: ensure its `Acl` implementation satisfies `Laminas\Permissions\Acl\AclInterface` so host apps can alias `Laminas\Permissions\Acl\AclInterface::class => Webware\Acl\Acl::class`. Existing `RegisterWidgetListener` already bridges the event seam — no delegator or extra middleware needed. | | |
 
-### Implementation Phase 4 — Validation
+### Implementation Phase 5 — Validation
 
-- GOAL-004: Prove the refactor green and the decoupling real.
+- GOAL-005: Prove the refactor green and the decoupling real.
 
 | Task | Description | Completed | Date |
 |------|-------------|-----------|------|
@@ -83,6 +97,9 @@ Full design context: <https://github.com/webinertia/webware-admin/issues/12>
 - **ALT-001**: `mezzio-authorization` (mezzio's laminas-acl integration) as the filtering seam. Rejected — its string-based `isGranted()` fights webware-acl's object-centric `UserInterface`/assertion design (research in issue #12). Its **config structure** IS adopted for admin's shipped defaults (`mezzio-authorization-acl` key: roles/resources/allow).
 - **ALT-002**: Move `AclWidgetFilterIterator` to webware-acl and have acl re-filter via a delegator or extra middleware. Rejected — filtering must stay in admin so the dashboard fails closed by construction (REQ-003); a delegator also silently breaks admin's fail-closed guarantee if acl is absent.
 - **ALT-003**: Admin-defined `WidgetFilterInterface` service seam with acl providing the implementation. Rejected as over-engineering — the user's directive is a plain laminas type hint.
+- **ALT-004**: WidgetManager extending `AbstractSingleInstancePluginManager` (laminas-servicemanager) with `$instanceOf = WidgetInterface::class` guarding validation. Rejected — the initial IMS rebuild around `/vendor` would absorb a huge refactor surface for marginal gain; plain typed mutation paths achieve the same guarantee.
+- **ALT-005**: Hand-rolled `Iterator` (vs `IteratorAggregate`) on `WidgetContainer`. Rejected — a hand-rolled iterator shares one cursor across nested iterations; `IteratorAggregate` returning a fresh `ArrayIterator` per call avoids the aliasing trap.
+- **ALT-006**: Keep the `instanceof WidgetInterface` guard inside `AclWidgetFilterIterator::accept()`. Rejected — with the constructor taking `WidgetContainer`, type safety is structural and the runtime check is dead weight.
 
 ## 4. Dependencies
 
@@ -98,7 +115,10 @@ Full design context: <https://github.com/webinertia/webware-admin/issues/12>
 - **FILE-002**: `src/ConfigProvider.php` — re-shaped `getAclConfig()` (mezzio-authorization-acl structure, roles `User`/`Administrator`, resource = admin dashboard route name); `AclInterface::class` key and `Webware\Acl` import removed.
 - **FILE-003**: `src/Middleware/DashboardMiddleware.php` — laminas type hint, mezzio user attribute, fail-closed RoleInterface bridge, keeps filtering.
 - **FILE-004**: `src/Container/DashboardMiddlewareFactory.php` — laminas import.
-- **FILE-005**: `src/Widget/AclWidgetFilterIterator.php` — re-typed to laminas `AclInterface` + `?RoleInterface`; stays in admin.
+- **FILE-005**: `src/Widget/AclWidgetFilterIterator.php` — moved to `src/AclWidgetFilterIterator.php` (root namespace) and re-typed to laminas `AclInterface` + `?RoleInterface`; constructor now takes `WidgetContainer`; stays in admin.
+- **FILE-005a**: `src/Widget/WidgetInterface.php` — moved to `src/WidgetInterface.php` (root namespace).
+- **FILE-005b**: `src/WidgetContainer.php` — NEW: typed widget collection (TASK-016).
+- **FILE-005c**: `src/Event/RegisterWidgetEvent.php` — holds `WidgetContainer`; `registerWidget()`/`getWidgetContainer()` API.
 - **FILE-006**: `test/unit/AclWidgetFilterIteratorTest.php` — re-enabled with laminas stubs + `GenericRole` user.
 - **FILE-007**: `test/unit/DashboardMiddlewareTest.php` — NEW: allowed/denied/missing-user/non-role-aware-user cases.
 - **FILE-008**: `test/integration/DashboardMiddlewareIntegrationTest.php` — NEW: real PhpSession + real laminas Acl, no DB (CON-002).
@@ -109,11 +129,12 @@ Full design context: <https://github.com/webinertia/webware-admin/issues/12>
 
 ## 6. Testing
 
-- **TEST-001**: `AclWidgetFilterIteratorTest` (re-enabled, no skips): laminas `AclInterface` stubs + `Laminas\Permissions\Acl\Role\GenericRole` user — accepts when allowed, filters partially allowed, rejects non-widgets, rejects when denied, denies all with a null user (fail closed).
+- **TEST-001**: `AclWidgetFilterIteratorTest` (re-enabled, no skips): laminas `AclInterface` stubs + `Laminas\Permissions\Acl\Role\GenericRole` user — accepts when allowed, filters partially allowed, rejects when denied, denies all with a null user (fail closed). Non-widget rejection is now enforced by the `WidgetContainer` constructor instead of an `instanceof` guard.
 - **TEST-002**: `DashboardMiddlewareTest` (new): allowed widgets attached to the `RegisterWidgetEvent::class` attribute; denied widgets filtered; missing user ⇒ empty iterator; non-`RoleInterface` user (`Mezzio\Authentication\DefaultUser`) ⇒ empty iterator (fail closed).
 - **TEST-003**: `DashboardMiddlewareIntegrationTest` (new, DB-free): real `PhpSession` adapter authenticates a session-bound dual-interface user (Mezzio `UserInterface` + laminas `RoleInterface`), then a real `Laminas\Permissions\Acl\Acl` drives `DashboardMiddleware` — Administrator sees the widget, Member sees none.
 - **TEST-004**: `ConfigProviderIntegrationTest`: assert the `mezzio-authorization-acl` defaults (roles `User`/`Administrator`, resource/allow = `webware.admin.dashboard.read`), assert every getter and `__invoke()` return their exact expected shape via `TestAssets\ExpectedConfig` (kills `ArrayItemRemoval` mutants), and assert that no `Laminas\Permissions\Acl\AclInterface::class` service definition is registered.
 - **TEST-005**: Full CI matrix (mago, unit lowest/locked/latest, coverage, infection) green in both repos.
+- **TEST-006**: `WidgetContainerTest` (new): empty container, constructor seeds one widget, `addWidget()` maintains ascending `$order`, `getIterator()` returns a fresh iterator per call. `RegisterWidgetEventTest` updated for the container API (delegation + stable container instance).
 
 ## 7. Risks & Assumptions
 

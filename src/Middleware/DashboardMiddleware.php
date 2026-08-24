@@ -13,8 +13,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Webware\Admin\AclWidgetFilterIterator;
 use Webware\Admin\Event\RegisterWidgetEvent;
-use Webware\Admin\Widget\AclWidgetFilterIterator;
 
 /**
  * Dispatches RegisterWidgetEvent so that modules may contribute
@@ -40,7 +40,7 @@ final class DashboardMiddleware implements MiddlewareInterface
         /** @var UserInterface|null $user */
         $user    = $request->getAttribute(UserInterface::class);
         $widgets = new AclWidgetFilterIterator(
-            $event->getIterator(),
+            $event->getWidgetContainer(),
             $this->acl,
             $user instanceof RoleInterface ? $user : null,
         );

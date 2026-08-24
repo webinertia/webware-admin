@@ -8,7 +8,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Webware\Admin\Event\RegisterWidgetEvent;
-use Webware\Admin\Widget\WidgetInterface;
+use Webware\Admin\WidgetContainer;
+use Webware\Admin\WidgetInterface;
 
 use function array_map;
 use function iterator_to_array;
@@ -17,38 +18,34 @@ use function iterator_to_array;
 final class RegisterWidgetEventTest extends TestCase
 {
     #[Test]
-    public function getIteratorReturnsEmptyWhenNoWidgetsRegistered(): void
+    public function getWidgetContainerReturnsEmptyWhenNoWidgetsRegistered(): void
     {
         $event = new RegisterWidgetEvent();
 
-        self::assertCount(0, $event->getIterator());
+        self::assertCount(0, $event->getWidgetContainer());
     }
 
     #[Test]
-    public function getIteratorReturnsSortedByOrder(): void
+    public function getWidgetContainerReturnsSameContainerInstance(): void
+    {
+        $event = new RegisterWidgetEvent();
+
+        self::assertSame($event->getWidgetContainer(), $event->getWidgetContainer());
+        self::assertInstanceOf(WidgetContainer::class, $event->getWidgetContainer());
+    }
+
+    #[Test]
+    public function registerWidgetDelegatesToWidgetContainer(): void
     {
         $event = new RegisterWidgetEvent();
         $event->registerWidget($this->makeWidget(30));
         $event->registerWidget($this->makeWidget(10));
         $event->registerWidget($this->makeWidget(20));
 
-        $widgets = iterator_to_array($event->getIterator(), preserve_keys: false);
+        $widgets = iterator_to_array($event->getWidgetContainer(), preserve_keys: false);
 
+        self::assertCount(3, $widgets);
         self::assertSame([10, 20, 30], array_map(static fn($w) => $w->order, $widgets));
-    }
-
-    #[Test]
-    public function multipleCallsToGetIteratorReturnIndependentIterators(): void
-    {
-        $event = new RegisterWidgetEvent();
-        $event->registerWidget($this->makeWidget(1));
-
-        $a = $event->getIterator();
-        $b = $event->getIterator();
-
-        self::assertNotSame($a, $b);
-        self::assertCount(1, $a);
-        self::assertCount(1, $b);
     }
 
     private function makeWidget(int $order, string $resourceId = 'admin.test'): WidgetInterface

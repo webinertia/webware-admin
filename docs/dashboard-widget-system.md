@@ -3,7 +3,7 @@ title: Admin Dashboard Widget System - Technical Documentation
 component_path: src/webware-admin/src/
 version: 1.0.0
 date_created: 2026-05-06
-last_updated: 2026-05-07
+last_updated: 2026-08-23
 owner: Webware\Admin
 tags: [admin, dashboard, widget, psr-14, acl, mezzio]
 ---
@@ -25,7 +25,8 @@ A PSR-14 event-driven system that allows any module in the application to contri
 
 **Included:**
 - `WidgetInterface` contract (PHP 8.4 get-hooked properties)
-- `RegisterWidgetEvent` — mutable PSR-14 event listeners call `addWidget()` on
+- `WidgetContainer` — typed collection enforcing that only `WidgetInterface` instances can be filtered
+- `RegisterWidgetEvent` — mutable PSR-14 event; listeners call `registerWidget()` on it
 - `DashboardMiddleware` — dispatches the event, filters, sets request attribute
 - `AclWidgetFilterIterator` — PHP `FilterIterator` wrapping the ACL check
 - `DashboardHandler` — reads the filtered iterator and renders the dashboard template
@@ -45,7 +46,8 @@ A PSR-14 event-driven system that allows any module in the application to contri
 |---|---|
 | **Collect Event** (mutable PSR-14 event) | `RegisterWidgetEvent` — listeners push data in |
 | **Chain of Responsibility** | Middleware pipeline — `DashboardMiddleware` → `DashboardHandler` |
-| **Iterator / FilterIterator** | `AclWidgetFilterIterator` wraps `ArrayIterator<WidgetInterface>` |
+| **IteratorAggregate / FilterIterator** | `WidgetContainer` yields a fresh `ArrayIterator`; `AclWidgetFilterIterator` filters it |
+| **Type Safety by Construction** | `WidgetContainer::addWidget(WidgetInterface)` is the only mutation path — no `instanceof` guards needed downstream |
 | **Interface Segregation** | `WidgetInterface` extends `Laminas\Permissions\Acl\Resource\ResourceInterface` |
 | **Factory** | Every service has a corresponding `*Factory` in `Container/` |
 
@@ -53,7 +55,7 @@ A PSR-14 event-driven system that allows any module in the application to contri
 
 ```mermaid
 classDiagram
-    namespace Webware_Admin_Widget {
+    namespace Webware_Admin {
         class WidgetInterface {
             <<interface>>
             +string title
@@ -63,18 +65,24 @@ classDiagram
             +int order
             +getResourceId() string
         }
+        class WidgetContainer {
+            -WidgetInterface[] widgets
+            +__construct(?WidgetInterface)
+            +addWidget(WidgetInterface) void
+            +getIterator() Iterator
+        }
         class AclWidgetFilterIterator {
             -AclInterface acl
-            -string[] roles
+            -?RoleInterface user
             +accept() bool
         }
     }
 
     namespace Webware_Admin_Event {
         class RegisterWidgetEvent {
-            -WidgetInterface[] widgets
-            +addWidget(WidgetInterface) void
-            +getIterator() ArrayIterator
+            -WidgetContainer widgets
+            +registerWidget(WidgetInterface) void
+            +getWidgetContainer() WidgetContainer
         }
     }
 
@@ -94,9 +102,10 @@ classDiagram
     }
 
     WidgetInterface --|> ResourceInterface : extends
-    AclWidgetFilterIterator --> WidgetInterface : filters
+    WidgetContainer --> WidgetInterface : contains
+    AclWidgetFilterIterator --> WidgetContainer : filters
     AclWidgetFilterIterator --> AclInterface : isAllowed()
-    RegisterWidgetEvent --> WidgetInterface : collects
+    RegisterWidgetEvent --> WidgetContainer : owns
     DashboardMiddleware --> RegisterWidgetEvent : dispatches
     DashboardMiddleware --> AclWidgetFilterIterator : creates
     DashboardHandler --> RegisterWidgetEvent : reads attribute
@@ -117,8 +126,8 @@ sequenceDiagram
     Route Pipeline->>DashboardMiddleware: process(request)
     DashboardMiddleware->>EventDispatcher: dispatch(RegisterWidgetEvent)
     EventDispatcher->>ModuleListener: __invoke(event)
-    ModuleListener->>RegisterWidgetEvent: addWidget(widget)
-    DashboardMiddleware->>AclWidgetFilterIterator: new(event->getIterator(), acl, roles)
+    ModuleListener->>RegisterWidgetEvent: registerWidget(widget)
+    DashboardMiddleware->>AclWidgetFilterIterator: new(event->getWidgetContainer(), acl, user)
     DashboardMiddleware->>Route Pipeline: request->withAttribute(iterator)
     Route Pipeline->>DashboardHandler: handle(request)
     DashboardHandler->>Template: render('admin::dashboard', ['widgets' => iterator])
@@ -146,12 +155,22 @@ Extends `Laminas\Permissions\Acl\Resource\ResourceInterface` so widgets can be p
 
 All properties must be declared with a `get` hook — PHP 8.4 asymmetric visibility.
 
+### `WidgetContainer`
+
+A typed collection that can only ever hold `WidgetInterface` instances. Its constructor (optionally accepting one widget) and `addWidget()` are the only mutation paths, both typed — so downstream code never needs an `instanceof` guard.
+
+| Method | Parameters | Returns | Description |
+|---|---|---|---|
+| `__construct()` | `?WidgetInterface $widget` | — | Seeds the container with one widget, if given |
+| `addWidget()` | `WidgetInterface $widget` | `void` | Adds a widget, keeping the container sorted ascending by `$order` |
+| `getIterator()` | — | `Iterator<int, WidgetInterface>` | Returns a fresh `ArrayIterator` over the sorted widgets |
+
 ### `RegisterWidgetEvent`
 
 | Method | Parameters | Returns | Description |
 |---|---|---|---|
-| `addWidget()` | `WidgetInterface $widget` | `void` | Appends a widget; called by module listeners |
-| `getIterator()` | — | `ArrayIterator<int, WidgetInterface>` | Returns widgets sorted ascending by `$order` |
+| `registerWidget()` | `WidgetInterface $widget` | `void` | Delegates to the container's `addWidget()`; called by module listeners |
+| `getWidgetContainer()` | — | `WidgetContainer` | Returns the event's widget container |
 
 ### `DashboardMiddleware`
 
@@ -159,7 +178,7 @@ Sets the `RegisterWidgetEvent::class` request attribute to an `AclWidgetFilterIt
 
 ### `AclWidgetFilterIterator`
 
-Extends PHP's built-in `FilterIterator`. `accept()` returns `true` when `$acl->isAllowed($roles, $widget->resourceId, $widget->privilege)` passes.
+Extends PHP's built-in `FilterIterator`. Its constructor accepts a `WidgetContainer` directly, so every item it filters is guaranteed to be a `WidgetInterface` by construction. `accept()` returns `true` when `$acl->isAllowed($user, $widget->resourceId, $widget->privilege)` passes, and fails closed when the user is null.
 
 ---
 
@@ -172,7 +191,7 @@ Extends PHP's built-in `FilterIterator`. `accept()` returns `true` when `$acl->i
 ```php
 namespace Product\Admin\Widget;
 
-use Webware\Admin\Widget\WidgetInterface;
+use Webware\Admin\WidgetInterface;
 
 final class ProductsWidget implements WidgetInterface
 {
@@ -208,7 +227,7 @@ final class CollectProductWidgetListener
 
     public function __invoke(RegisterWidgetEvent $event): void
     {
-        $event->addWidget(new ProductsWidget($this->products->count()));
+        $event->registerWidget(new ProductsWidget($this->products->count()));
     }
 }
 ```
@@ -267,10 +286,11 @@ $app->get('/admin', [
 ### Security
 - Widget visibility is enforced by the ACL before the handler renders — a module widget is never sent to the template if the current user lacks the required resource/privilege. Filtering fails closed: without an authenticated, role-aware user, no widgets are shown.
 - `WidgetInterface` extends `ResourceInterface`, and the iterator passes each widget's `resourceId`/`privilege` directly to `isAllowed()` without string coercion.
+- Type safety is structural: `WidgetContainer` accepts only `WidgetInterface` instances via its constructor and `addWidget()`, and there is no other way to mutate its state — the filter cannot receive a non-widget item.
 
 ### Performance
 - The iterator is lazy — `FilterIterator::accept()` is called only when the template iterates; no up-front array construction of filtered results.
-- The `CollectDashboardWidgetsEvent` performs one `usort` on `getIterator()` call.
+- `WidgetContainer::addWidget()` performs one `usort` per insertion (widget counts are small), so `getIterator()` is a plain, cheap `ArrayIterator` copy.
 
 ### Extensibility
 - Any module can contribute widgets by registering a single PSR-14 listener. No modification to `webware-admin` is required.
@@ -326,7 +346,8 @@ The consuming application MUST provide a `Laminas\Permissions\Acl\AclInterface` 
 
 - **`DashboardMiddleware`**: mock `EventDispatcherInterface` to return a pre-populated event; assert the request attribute is an `AclWidgetFilterIterator`.
 - **`AclWidgetFilterIterator`**: stub `AclInterface::isAllowed()` to return `true`/`false`; assert only permitted widgets are yielded.
-- **`RegisterWidgetEvent`**: assert `getIterator()` returns widgets sorted by `$order`.
+- **`WidgetContainer`**: assert `addWidget()` maintains ascending `$order` and `getIterator()` returns a fresh iterator per call.
+- **`RegisterWidgetEvent`**: assert `registerWidget()` delegates to the container and `getWidgetContainer()` returns the same container instance.
 - **Widget implementations**: construct directly and assert property values.
 
 ### Related Documentation

@@ -18,10 +18,10 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use stdClass;
+use Webware\Admin\AclWidgetFilterIterator;
 use Webware\Admin\Event\RegisterWidgetEvent;
 use Webware\Admin\Middleware\DashboardMiddleware;
-use Webware\Admin\Widget\AclWidgetFilterIterator;
-use Webware\Admin\Widget\WidgetInterface;
+use Webware\Admin\WidgetInterface;
 
 use function is_array;
 use function iterator_to_array;

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace WebwareTest\Admin;
 
-use ArrayIterator;
 use Laminas\Permissions\Acl\AclInterface;
 use Laminas\Permissions\Acl\Role\GenericRole;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Webware\Admin\Widget\AclWidgetFilterIterator;
-use Webware\Admin\Widget\WidgetInterface;
+use Webware\Admin\AclWidgetFilterIterator;
+use Webware\Admin\WidgetContainer;
+use Webware\Admin\WidgetInterface;
 
 use function iterator_to_array;
 
@@ -27,7 +27,7 @@ final class AclWidgetFilterIteratorTest extends TestCase
         $acl->method('isAllowed')->willReturn(true);
 
         $iterator = new AclWidgetFilterIterator(
-            new ArrayIterator([$widget]),
+            new WidgetContainer($widget),
             $acl,
             new GenericRole('Administrator'),
         );
@@ -45,7 +45,7 @@ final class AclWidgetFilterIteratorTest extends TestCase
             ->method('isAllowed');
 
         $iterator = new AclWidgetFilterIterator(
-            new ArrayIterator([$widget]),
+            new WidgetContainer($widget),
             $acl,
             null,
         );
@@ -64,8 +64,11 @@ final class AclWidgetFilterIteratorTest extends TestCase
             static fn(mixed $role, mixed $resource, mixed $privilege): bool => 'admin.dashboard' === $resource,
         );
 
+        $widgets = new WidgetContainer($allowed);
+        $widgets->addWidget($denied);
+
         $iterator = new AclWidgetFilterIterator(
-            new ArrayIterator([$allowed, $denied]),
+            $widgets,
             $acl,
             new GenericRole('Administrator'),
         );
@@ -73,20 +76,6 @@ final class AclWidgetFilterIteratorTest extends TestCase
         $results = iterator_to_array($iterator, preserve_keys: false);
         self::assertCount(1, $results);
         self::assertSame('admin.dashboard', $results[0]->resourceId);
-    }
-
-    #[Test]
-    public function itRejectsNonWidgetItems(): void
-    {
-        $acl = $this->createMock(AclInterface::class);
-        $acl->expects(self::never())
-            ->method('isAllowed');
-
-        /** @var ArrayIterator<int, mixed> $inner */
-        $inner    = new ArrayIterator(['not-a-widget']);
-        $iterator = new AclWidgetFilterIterator($inner, $acl, new GenericRole('Administrator'));
-
-        self::assertCount(0, iterator_to_array($iterator));
     }
 
     #[Test]
@@ -98,7 +87,7 @@ final class AclWidgetFilterIteratorTest extends TestCase
         $acl->method('isAllowed')->willReturn(false);
 
         $iterator = new AclWidgetFilterIterator(
-            new ArrayIterator([$widget]),
+            new WidgetContainer($widget),
             $acl,
             new GenericRole('Administrator'),
         );
