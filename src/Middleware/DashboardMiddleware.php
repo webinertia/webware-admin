@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Webware\Admin\Middleware;
 
+use Laminas\Permissions\Acl\AclInterface;
+use Laminas\Permissions\Acl\Role\RoleInterface;
+use Mezzio\Authentication\UserInterface;
 use Override;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Webware\Acl\AclInterface;
+use Webware\Admin\AclWidgetFilterIterator;
 use Webware\Admin\Event\RegisterWidgetEvent;
-use Webware\Admin\Widget\AclWidgetFilterIterator;
-use Webware\UserManager\UserInterface;
 
 /**
  * Dispatches RegisterWidgetEvent so that modules may contribute
@@ -36,8 +37,13 @@ final class DashboardMiddleware implements MiddlewareInterface
         /** @var RegisterWidgetEvent $event */
         $event = $this->dispatcher->dispatch(new RegisterWidgetEvent());
 
+        /** @var UserInterface|null $user */
         $user    = $request->getAttribute(UserInterface::class);
-        $widgets = new AclWidgetFilterIterator($event->getIterator(), $this->acl, $user);
+        $widgets = new AclWidgetFilterIterator(
+            $event->getWidgetContainer(),
+            $this->acl,
+            $user instanceof RoleInterface ? $user : null,
+        );
 
         return $handler->handle(
             $request->withAttribute(RegisterWidgetEvent::class, $widgets),

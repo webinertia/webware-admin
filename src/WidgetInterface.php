@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Webware\Admin\Widget;
+namespace Webware\Admin;
 
 use Laminas\Permissions\Acl\Resource\ResourceInterface;
 

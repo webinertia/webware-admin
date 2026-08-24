@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Webware\Admin\Container;
 
+use Laminas\Permissions\Acl\AclInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Webware\Acl\AclInterface;
 use Webware\Admin\Middleware\DashboardMiddleware;
 
 final class DashboardMiddlewareFactory
