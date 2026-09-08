@@ -2485,12 +2485,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webinertia/webware-core.git",
-                "reference": "91410fa4154af9c7a57aaa034dd26bc05696bd01"
+                "reference": "426f49fdcd44e5ec20c952b8731e96c75edf9bd9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webinertia/webware-core/zipball/91410fa4154af9c7a57aaa034dd26bc05696bd01",
-                "reference": "91410fa4154af9c7a57aaa034dd26bc05696bd01",
+                "url": "https://api.github.com/repos/webinertia/webware-core/zipball/426f49fdcd44e5ec20c952b8731e96c75edf9bd9",
+                "reference": "426f49fdcd44e5ec20c952b8731e96c75edf9bd9",
                 "shasum": ""
             },
             "require": {
@@ -2509,6 +2509,9 @@
                 "laminas/laminas-diactoros": "^3.8",
                 "laminas/laminas-filter": "3.5.x-dev",
                 "php-db/phpdb": "^0.6.0",
+                "php-db/phpdb-mysql": "^0.5.x-dev",
+                "php-db/phpdb-pgsql": "^0.1.x-dev",
+                "php-db/phpdb-sqlite": "^0.3.x-dev",
                 "phpbench/phpbench": "^1.7",
                 "phpunit/phpunit": "^13.3",
                 "roave/backward-compatibility-check": "^8.21.0",
@@ -2565,7 +2568,7 @@
                 "source": "https://github.com/webinertia/webware-core/tree/0.1.x",
                 "issues": "https://github.com/webinertia/webware-core/issues"
             },
-            "time": "2026-09-04T00:49:38+00:00"
+            "time": "2026-09-06T05:43:55+00:00"
         }
     ],
     "packages-dev": [
