@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c8da62f1b2e08728011213ae6d56cf89",
+    "content-hash": "490df7c862df8ba53218a4fb839ac6fa",
     "packages": [
         {
             "name": "brick/varexporter",
@@ -2481,22 +2481,23 @@
         },
         {
             "name": "webware/webware-core",
-            "version": "0.1.x-dev",
+            "version": "1.0.0-alpha.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webinertia/webware-core.git",
-                "reference": "426f49fdcd44e5ec20c952b8731e96c75edf9bd9"
+                "reference": "e74d76469b74a74ef40e8f12d6fb79590b32d6de"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webinertia/webware-core/zipball/426f49fdcd44e5ec20c952b8731e96c75edf9bd9",
-                "reference": "426f49fdcd44e5ec20c952b8731e96c75edf9bd9",
+                "url": "https://api.github.com/repos/webinertia/webware-core/zipball/e74d76469b74a74ef40e8f12d6fb79590b32d6de",
+                "reference": "e74d76469b74a74ef40e8f12d6fb79590b32d6de",
                 "shasum": ""
             },
             "require": {
                 "fig/http-message-util": "^1.1",
                 "laminas/laminas-inputfilter": "3.0.x-dev",
                 "laminas/laminas-permissions-acl": "^2.16",
+                "mezzio/mezzio-authentication": "^1.13",
                 "php": "~8.4.1 || ~8.5.0",
                 "php-db/phpdb": "^0.6.x-dev",
                 "php-standard-library/type": "^6.2.1",
@@ -2518,36 +2519,13 @@
                 "roave/security-advisories": "dev-master",
                 "webware/webware-tools": "^0.1.x-dev"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
                     "Webware\\Core\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "WebwareTest\\Core\\": "test/unit/",
-                    "WebwareTestIntegration\\Core\\": "test/integration/"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "phpunit --no-coverage --colors=always --testsuite \"unit test\""
-                ],
-                "test-coverage": [
-                    "phpunit --colors=always --coverage-clover clover.xml --coverage-html coverage/html --coverage-text"
-                ],
-                "test-integration": [
-                    "phpunit --no-coverage --colors=always --testsuite \"integration test\""
-                ],
-                "mutation-test": [
-                    "infection"
-                ],
-                "test-all": [
-                    "@test && @test-integration && @mutation-test"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -2565,10 +2543,10 @@
                 "webware"
             ],
             "support": {
-                "source": "https://github.com/webinertia/webware-core/tree/0.1.x",
-                "issues": "https://github.com/webinertia/webware-core/issues"
+                "issues": "https://github.com/webinertia/webware-core/issues",
+                "source": "https://github.com/webinertia/webware-core/tree/1.0.0-alpha.1"
             },
-            "time": "2026-09-06T05:43:55+00:00"
+            "time": "2026-09-17T00:15:21+00:00"
         }
     ],
     "packages-dev": [
@@ -12484,7 +12462,6 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "roave/security-advisories": 20,
-        "webware/webware-core": 20,
         "webware/webware-tools": 20
     },
     "prefer-stable": true,

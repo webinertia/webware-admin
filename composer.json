@@ -57,12 +57,6 @@
             "WebwareTestIntegration\\Admin\\": "test/integration/"
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/webinertia/webware-core"
-        }
-    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
