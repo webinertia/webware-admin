@@ -61,10 +61,6 @@
         {
             "type": "vcs",
             "url": "https://github.com/webinertia/webware-core"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/webinertia/webware-resultset"
         }
     ],
     "minimum-stability": "dev",
