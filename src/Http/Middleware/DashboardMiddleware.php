@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Webware\Admin\Middleware;
+namespace Webware\Admin\Http\Middleware;
 
 use Laminas\Permissions\Acl\AclInterface;
 use Laminas\Permissions\Acl\Role\RoleInterface;
