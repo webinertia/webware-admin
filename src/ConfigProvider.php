@@ -7,8 +7,8 @@ namespace Webware\Admin;
 use Webware\Admin\Container\DashboardHandlerFactory;
 use Webware\Admin\Container\DashboardMiddlewareFactory;
 use Webware\Admin\Container\RouteProviderFactory;
-use Webware\Admin\Middleware\DashboardMiddleware;
-use Webware\Admin\RequestHandler\DashboardHandler;
+use Webware\Admin\Http\Middleware\DashboardMiddleware;
+use Webware\Admin\Http\RequestHandler\DashboardHandler;
 use Webware\Admin\View\Helper\AdminUrl;
 use Webware\Admin\View\Helper\AdminUrlFactory;
 

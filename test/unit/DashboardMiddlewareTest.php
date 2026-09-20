@@ -20,7 +20,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use stdClass;
 use Webware\Admin\AclWidgetFilterIterator;
 use Webware\Admin\Event\RegisterWidgetEvent;
-use Webware\Admin\Middleware\DashboardMiddleware;
+use Webware\Admin\Http\Middleware\DashboardMiddleware;
 use Webware\Admin\WidgetInterface;
 
 use function is_array;

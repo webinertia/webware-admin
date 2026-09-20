@@ -8,7 +8,7 @@ use Mezzio\Template\TemplateRendererInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Webware\Admin\RequestHandler\DashboardHandler;
+use Webware\Admin\Http\RequestHandler\DashboardHandler;
 
 final class DashboardHandlerFactory
 {

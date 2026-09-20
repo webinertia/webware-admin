@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Webware\Admin\RequestHandler;
+namespace Webware\Admin\Http\RequestHandler;
 
 use Laminas\Diactoros\Exception\InvalidArgumentException;
 use Laminas\Diactoros\Response\HtmlResponse;

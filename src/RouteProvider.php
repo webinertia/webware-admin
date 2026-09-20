@@ -9,7 +9,7 @@ use Mezzio\MiddlewareFactoryInterface;
 use Mezzio\Router\RouteCollectorInterface;
 use Mezzio\Router\RouteProviderInterface;
 use Override;
-use Webware\Admin\Middleware\DashboardMiddleware;
+use Webware\Admin\Http\Middleware\DashboardMiddleware;
 
 final readonly class RouteProvider implements RouteProviderInterface
 {
@@ -31,7 +31,7 @@ final readonly class RouteProvider implements RouteProviderInterface
             $middlewareFactory->prepare(
                 [
                     DashboardMiddleware::class,
-                    RequestHandler\DashboardHandler::class,
+                    Http\RequestHandler\DashboardHandler::class,
                 ],
             ),
             "{$this->routeNamePrefix}dashboard.read",

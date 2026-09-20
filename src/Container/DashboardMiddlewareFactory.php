@@ -9,7 +9,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Webware\Admin\Middleware\DashboardMiddleware;
+use Webware\Admin\Http\Middleware\DashboardMiddleware;
 
 final class DashboardMiddlewareFactory
 {
