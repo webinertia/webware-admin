@@ -21,7 +21,7 @@ final class ExpectedConfig
 {
     public static function getDashboardResource(): string
     {
-        return Configuration::ADMIN_ROUTE_NAME_PREFIX_VALUE . 'dashboard.read';
+        return Configuration::ADMIN_NAME . '.dashboard.read';
     }
 
     /**
@@ -74,8 +74,7 @@ final class ExpectedConfig
      *     allow: array<string, list<string>>
      *   },
      *   Webware\Admin\AdminInterface: array{
-     *     admin_route_segment: string,
-     *     admin_route_name_prefix: string
+     *     admin_name: string
      *   }
      * }
      */
@@ -93,15 +92,13 @@ final class ExpectedConfig
 
     /**
      * @return array{
-     *   admin_route_segment: string,
-     *   admin_route_name_prefix: string
+     *   admin_name: string
      * }
      */
     public static function getExpectedDefaultConfig(): array
     {
         return [
-            Configuration::ADMIN_ROUTE_SEGMENT_KEY     => Configuration::ADMIN_ROUTE_SEGMENT_VALUE,
-            Configuration::ADMIN_ROUTE_NAME_PREFIX_KEY => Configuration::ADMIN_ROUTE_NAME_PREFIX_VALUE,
+            Configuration::ADMIN_NAME_KEY => Configuration::ADMIN_NAME,
         ];
     }
 

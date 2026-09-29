@@ -9,18 +9,20 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Webware\Admin\Container\Configuration;
+use Webware\Core\Exception;
 
 final readonly class AdminUrlFactory
 {
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws Exception\ExceptionInterface
      */
     public function __invoke(ContainerInterface $container): AdminUrl
     {
         return new AdminUrl(
             urlHelper      : $container->get(UrlHelper::class),
-            routeNamePrefix: Configuration::getAdminRouteNamePrefix($container, self::class),
+            routeNamePrefix: Configuration::getAdminNamePrefix($container, self::class),
         );
     }
 }
