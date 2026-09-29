@@ -21,8 +21,7 @@ use function dirname;
  *   allow: array<string, list<string>>
  * }
  * @type DefaultConfig = array{
- *   admin_route_segment: string,
- *   admin_route_name_prefix: string
+ *   admin_name: string
  * }
  * @type Dependencies = array{
  *   factories: array<class-string, class-string>
@@ -66,11 +65,11 @@ final readonly class ConfigProvider
                 'Administrator' => ['User'],
             ],
             'resources' => [
-                Container\Configuration::ADMIN_ROUTE_NAME_PREFIX_VALUE . 'dashboard.read',
+                Container\Configuration::ADMIN_NAME . '.dashboard.read',
             ],
             'allow'     => [
                 'Administrator' => [
-                    Container\Configuration::ADMIN_ROUTE_NAME_PREFIX_VALUE . 'dashboard.read',
+                    Container\Configuration::ADMIN_NAME . '.dashboard.read',
                 ],
             ],
         ];
@@ -80,8 +79,7 @@ final readonly class ConfigProvider
     public function getDefaultConfig(): array
     {
         return [
-            Container\Configuration::ADMIN_ROUTE_SEGMENT_KEY     => Container\Configuration::ADMIN_ROUTE_SEGMENT_VALUE,
-            Container\Configuration::ADMIN_ROUTE_NAME_PREFIX_KEY => Container\Configuration::ADMIN_ROUTE_NAME_PREFIX_VALUE,
+            Container\Configuration::ADMIN_NAME_KEY => Container\Configuration::ADMIN_NAME,
         ];
     }
 
