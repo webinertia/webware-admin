@@ -11,6 +11,7 @@ use Webware\Admin\Http\Middleware\DashboardMiddleware;
 use Webware\Admin\Http\RequestHandler\DashboardHandler;
 use Webware\Admin\View\Helper\AdminUrl;
 use Webware\Admin\View\Helper\AdminUrlFactory;
+use Webware\Core\AclInterface as CoreAclInterface;
 
 use function dirname;
 
@@ -24,7 +25,8 @@ use function dirname;
  *   admin_name: string
  * }
  * @type Dependencies = array{
- *   factories: array<class-string, class-string>
+ *   factories: array<class-string, class-string>,
+ *   invokables: array<class-string, class-string>
  * }
  * @type RouteProviders = array{
  *   route-providers: list<class-string>
@@ -42,6 +44,7 @@ use function dirname;
  *   templates: Templates,
  *   view_helpers: ViewHelpers,
  *   'mezzio-authorization-acl': AclConfig,
+ *   Webware\Core\AclInterface: array{rule_seed_providers: list<class-string>},
  *   Webware\Admin\AdminInterface: DefaultConfig
  * }
  * @internal
@@ -87,10 +90,13 @@ final readonly class ConfigProvider
     public function getDependencies(): array
     {
         return [
-            'factories' => [
+            'factories'  => [
                 DashboardHandler::class    => DashboardHandlerFactory::class,
                 DashboardMiddleware::class => DashboardMiddlewareFactory::class,
                 RouteProvider::class       => RouteProviderFactory::class,
+            ],
+            'invokables' => [
+                Acl\RuleSeeds::class => Acl\RuleSeeds::class,
             ],
         ];
     }
@@ -137,6 +143,7 @@ final readonly class ConfigProvider
             'templates'                => $this->getTemplates(),
             'view_helpers'             => $this->getViewHelpers(),
             'mezzio-authorization-acl' => $this->getAclConfig(),
+            CoreAclInterface::class    => ['rule_seed_providers' => [Acl\RuleSeeds::class]],
             AdminInterface::class      => $this->getDefaultConfig(),
         ];
     }
