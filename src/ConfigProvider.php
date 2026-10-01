@@ -110,7 +110,7 @@ final readonly class ConfigProvider
     {
         return [
             'paths' => [
-                'admin' => [dirname(__DIR__) . '/templates/admin'],
+                'admin' => [dirname(__DIR__) . '/templates/default/admin'],
             ],
         ];
     }
