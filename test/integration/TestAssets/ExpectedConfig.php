@@ -147,7 +147,7 @@ final class ExpectedConfig
                     dirname(
                         path  : __DIR__,
                         levels: 3,
-                    ) . '/templates/admin',
+                    ) . '/templates/default/admin',
                 ],
             ],
         ];
