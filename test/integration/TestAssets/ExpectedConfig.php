@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WebwareTestIntegration\Admin\TestAssets;
 
+use Webware\Admin\Acl\RuleSeeds;
 use Webware\Admin\AdminInterface;
 use Webware\Admin\Container\Configuration;
 use Webware\Admin\Container\DashboardHandlerFactory;
@@ -14,6 +15,7 @@ use Webware\Admin\Http\RequestHandler\DashboardHandler;
 use Webware\Admin\RouteProvider;
 use Webware\Admin\View\Helper\AdminUrl;
 use Webware\Admin\View\Helper\AdminUrlFactory;
+use Webware\Core\AclInterface as CoreAclInterface;
 
 use function dirname;
 
@@ -86,6 +88,7 @@ final class ExpectedConfig
             'templates'                => self::getExpectedTemplates(),
             'view_helpers'             => self::getExpectedViewHelpers(),
             'mezzio-authorization-acl' => self::getExpectedAclConfig(),
+            CoreAclInterface::class    => ['rule_seed_providers' => [RuleSeeds::class]],
             AdminInterface::class      => self::getExpectedDefaultConfig(),
         ];
     }
@@ -104,16 +107,20 @@ final class ExpectedConfig
 
     /**
      * @return array{
-     *   factories: array<class-string, class-string>
+     *   factories: array<class-string, class-string>,
+     *   invokables: array<class-string, class-string>
      * }
      */
     public static function getExpectedDependencies(): array
     {
         return [
-            'factories' => [
+            'factories'  => [
                 DashboardHandler::class    => DashboardHandlerFactory::class,
                 DashboardMiddleware::class => DashboardMiddlewareFactory::class,
                 RouteProvider::class       => RouteProviderFactory::class,
+            ],
+            'invokables' => [
+                RuleSeeds::class => RuleSeeds::class,
             ],
         ];
     }
