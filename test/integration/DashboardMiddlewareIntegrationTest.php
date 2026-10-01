@@ -25,6 +25,7 @@ use Webware\Admin\AclWidgetFilterIterator;
 use Webware\Admin\Event\RegisterWidgetEvent;
 use Webware\Admin\Http\Middleware\DashboardMiddleware;
 use Webware\Admin\WidgetInterface;
+use Webware\Core\UserInterface as CoreUserInterface;
 
 use function array_key_exists;
 use function iterator_to_array;
@@ -125,7 +126,7 @@ final class DashboardMiddlewareIntegrationTest extends TestCase
 
         $middleware = new DashboardMiddleware($dispatcher, $acl);
         $middleware->process(
-            $request->withAttribute(UserInterface::class, $user),
+            $request->withAttribute(CoreUserInterface::class, $user),
             $handler,
         );
     }

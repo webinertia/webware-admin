@@ -22,6 +22,7 @@ use Webware\Admin\AclWidgetFilterIterator;
 use Webware\Admin\Event\RegisterWidgetEvent;
 use Webware\Admin\Http\Middleware\DashboardMiddleware;
 use Webware\Admin\WidgetInterface;
+use Webware\Core\UserInterface as CoreUserInterface;
 
 use function is_array;
 use function iterator_to_array;
@@ -182,7 +183,7 @@ final class DashboardMiddlewareTest extends TestCase
 
         $request = new ServerRequest();
         if (null !== $user) {
-            $request = $request->withAttribute(UserInterface::class, $user);
+            $request = $request->withAttribute(CoreUserInterface::class, $user);
         }
 
         $handler = new class($box) implements RequestHandlerInterface {
