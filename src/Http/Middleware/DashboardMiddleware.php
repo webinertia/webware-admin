@@ -6,7 +6,6 @@ namespace Webware\Admin\Http\Middleware;
 
 use Laminas\Permissions\Acl\AclInterface;
 use Laminas\Permissions\Acl\Role\RoleInterface;
-use Mezzio\Authentication\UserInterface;
 use Override;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -15,6 +14,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Webware\Admin\AclWidgetFilterIterator;
 use Webware\Admin\Event\RegisterWidgetEvent;
+use Webware\Core\UserInterface;
 
 /**
  * Dispatches RegisterWidgetEvent so that modules may contribute
