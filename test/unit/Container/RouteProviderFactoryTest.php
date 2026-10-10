@@ -80,7 +80,7 @@ final class RouteProviderFactoryTest extends TestCase
                 $this->createStub(MiddlewareInterface::class),
             );
 
-        (new RouteProviderFactory())($container)->registerRoutes($collector, $middlewareFactory);
+        new RouteProviderFactory()($container)->registerRoutes($collector, $middlewareFactory);
 
         return $registered;
     }

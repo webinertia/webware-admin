@@ -35,7 +35,7 @@ final class ConfigProviderIntegrationTest extends TestCase
     #[Test]
     public function configProviderDoesNotRegisterTheAclService(): void
     {
-        $config = (new ConfigProvider())();
+        $config = new ConfigProvider()();
 
         // The ACL implementation itself is supplied by the consuming
         // application (e.g. webware-acl aliased to the laminas AclInterface);
@@ -82,6 +82,6 @@ final class ConfigProviderIntegrationTest extends TestCase
     #[Test]
     public function invokeReturnsExpectedConfig(): void
     {
-        static::assertSame(ExpectedConfig::getExpectedConfig(), (new ConfigProvider())());
+        static::assertSame(ExpectedConfig::getExpectedConfig(), new ConfigProvider()());
     }
 }
