@@ -62,6 +62,6 @@ final class AdminUrlFactoryTest extends TestCase
             ->with($expectedRoute)
             ->willReturn('/admin');
 
-        return (new AdminUrlFactory())($this->container($config, $urlHelper))($routeName);
+        return new AdminUrlFactory()($this->container($config, $urlHelper))($routeName);
     }
 }
