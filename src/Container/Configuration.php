@@ -15,7 +15,7 @@ use function is_string;
  * Route naming for the admin namespace.
  *
  * This component owns the admin base every other module nests under. It is resolved here
- * once — ADMIN_NAME by default, overridable through ADMIN_NAME_KEY — and consulted by any
+ * once - ADMIN_NAME by default, overridable through ADMIN_NAME_KEY - and consulted by any
  * component that publishes admin routes, so the fleet cannot disagree about the base.
  *
  * This component's own routes are that namespace itself: segment `admin`, name prefix
@@ -35,7 +35,7 @@ final readonly class Configuration extends Config
     public const string ADMIN_NAME_KEY = 'admin_name';
 
     /**
-     * The admin namespace base, e.g. `admin`. Consult this — never a local constant —
+     * The admin namespace base, e.g. `admin`. Consult this - never a local constant -
      * when composing an admin route name or segment, so an application that relocates
      * the namespace relocates every module's admin routes with it.
      *

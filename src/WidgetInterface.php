@@ -32,6 +32,6 @@ interface WidgetInterface extends ResourceInterface
      */
     public string $template { get; }
 
-    /** Render order — lower values appear first. */
+    /** Render order - lower values appear first. */
     public int $order { get; }
 }
