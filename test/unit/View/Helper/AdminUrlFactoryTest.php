@@ -42,7 +42,8 @@ final class AdminUrlFactoryTest extends TestCase
     {
         $container = $this->createStub(ContainerInterface::class);
         $container->method('has')->willReturn(true);
-        $container->method('get')
+        $container
+            ->method('get')
             ->willReturnMap([
                 [UrlHelper::class, $urlHelper],
                 ['config', [AdminInterface::class => $config]],
@@ -57,7 +58,8 @@ final class AdminUrlFactoryTest extends TestCase
     private function resolveUrl(string $routeName, array $config, string $expectedRoute): string
     {
         $urlHelper = $this->createMock(UrlHelper::class);
-        $urlHelper->expects($this->once())
+        $urlHelper
+            ->expects($this->once())
             ->method('__invoke')
             ->with($expectedRoute)
             ->willReturn('/admin');
