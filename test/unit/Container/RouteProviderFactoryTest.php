@@ -60,7 +60,8 @@ final class RouteProviderFactoryTest extends TestCase
         $registered = [];
 
         $collector = $this->createMock(RouteCollectorInterface::class);
-        $collector->expects($this->once())
+        $collector
+            ->expects($this->once())
             ->method('get')
             ->willReturnCallback(
                 static function (
@@ -75,7 +76,8 @@ final class RouteProviderFactoryTest extends TestCase
             );
 
         $middlewareFactory = $this->createStub(MiddlewareFactoryInterface::class);
-        $middlewareFactory->method('prepare')
+        $middlewareFactory
+            ->method('prepare')
             ->willReturn(
                 $this->createStub(MiddlewareInterface::class),
             );

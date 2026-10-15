@@ -102,7 +102,8 @@ final class DashboardMiddlewareIntegrationTest extends TestCase
         $widget = $this->makeWidget('admin.dashboard', 'read');
 
         $dispatcher = $this->createStub(EventDispatcherInterface::class);
-        $dispatcher->method('dispatch')
+        $dispatcher
+            ->method('dispatch')
             ->willReturnCallback(
                 static function (RegisterWidgetEvent $event) use ($widget): object {
                     $event->registerWidget($widget);

@@ -35,7 +35,8 @@ final class RuleSeedsTest extends TestCase
         $names = [];
 
         $collector = $this->createStub(RouteCollectorInterface::class);
-        $collector->method('get')
+        $collector
+            ->method('get')
             ->willReturnCallback(
                 static function (string $path, MiddlewareInterface $mw, ?string $name = null) use (&$names): Route {
                     $names[] = $name;

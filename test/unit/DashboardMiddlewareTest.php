@@ -170,7 +170,8 @@ final class DashboardMiddlewareTest extends TestCase
         stdClass $box,
     ): void {
         $dispatcher = $this->createStub(EventDispatcherInterface::class);
-        $dispatcher->method('dispatch')
+        $dispatcher
+            ->method('dispatch')
             ->willReturnCallback(
                 static function (RegisterWidgetEvent $event) use ($widgets): object {
                     foreach (is_array($widgets) ? $widgets : [$widgets] as $widget) {
