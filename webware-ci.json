@@ -7,6 +7,6 @@
   "enable_codecov": true,
   "enable_infection": true,
   "coverage_php_version": "8.5",
-  "min_msi": "15",
-  "min_covered_msi": "15"
+  "min_msi": "98",
+  "min_covered_msi": "98"
 }

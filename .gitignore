@@ -9,3 +9,9 @@
 
 /.specify/
 /specs/
+
+# Windows shim for Infection's Mago static analysis tool. Infection probes for a
+# `.bat` before the extensionless binary, which is the only supported way to stop
+# it prefixing PHP_BINARY to a native Rust executable. Local to the machine, so
+# never committed. See webinertia/webware-tools issue 59.
+/mago.bat
