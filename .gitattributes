@@ -1,11 +1,14 @@
 /.gitattributes export-ignore
 /.github/ export-ignore
 /.gitignore export-ignore
+/.specify/ export-ignore
+/specs/ export-ignore
 /renovate.json export-ignore
 /phpunit.xml.dist export-ignore
 /test/ export-ignore
 /clover.xml export-ignore
 /mago.toml export-ignore
+/mago.bat export-ignore
 /benchmarks/ export-ignore
 /phpbench.json.dist export-ignore
 /infection.json5.dist export-ignore
