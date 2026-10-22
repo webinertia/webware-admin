@@ -35,10 +35,10 @@ services:
     build:
       context: .
       args:
-        # PHP version to base the image on (latest 8.4 patch release). Keep
+        # PHP version to base the image on (latest 8.5 patch release). Keep
         # in sync with the package's supported PHP versions and
         # `config.platform.php`.
-        PHP_VERSION: "8.4.24"
+        PHP_VERSION: "8.5.12"
     # Keep the container alive so `docker compose exec` can attach to it.
     # (VS Code Dev Containers override this with their own command.)
     command: sleep infinity
@@ -84,7 +84,7 @@ services:
   # the package's test-database convention.
   # -------------------------------------------------------------------------
   # mysql:
-  #   image: mysql:9.7
+  #   image: mysql:9.7.4
   #   environment:
   #     MYSQL_ROOT_PASSWORD: root
   #     MYSQL_DATABASE: webware
@@ -104,7 +104,7 @@ services:
   # # http://localhost:8080 (log in with the MYSQL_* credentials). Uncomment
   # # alongside `mysql`.
   # phpmyadmin:
-  #   image: phpmyadmin:latest
+  #   image: phpmyadmin:5.2.3
   #   environment:
   #     PMA_HOST: mysql
   #     PMA_PORT: 3306
