@@ -8,7 +8,7 @@
 /test/ export-ignore
 /clover.xml export-ignore
 /mago.toml export-ignore
-/mago.bat export-ignore
+/bin/mago.bat export-ignore
 /benchmarks/ export-ignore
 /phpbench.json.dist export-ignore
 /infection.json5.dist export-ignore

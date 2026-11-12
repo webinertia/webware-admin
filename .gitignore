@@ -13,7 +13,7 @@
 /mago-results.txt
 *:Zone.Identifier
 
-# `/mago.bat` is deliberately NOT listed here. It is a tracked artifact, shipped
+# `/bin/mago.bat` is deliberately NOT listed here. It is a tracked artifact, shipped
 # by the alignment task list and present in the repository template, because
 # Infection cannot run Mago on Windows without it. See issue 59.
 
