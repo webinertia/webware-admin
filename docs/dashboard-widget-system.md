@@ -24,6 +24,7 @@ A PSR-14 event-driven system that allows any module in the application to contri
 ### Scope
 
 **Included:**
+
 - `WidgetInterface` contract (PHP 8.4 get-hooked properties)
 - `WidgetContainer` - typed collection enforcing that only `WidgetInterface` instances can be filtered
 - `RegisterWidgetEvent` - mutable PSR-14 event; listeners call `registerWidget()` on it
@@ -32,6 +33,7 @@ A PSR-14 event-driven system that allows any module in the application to contri
 - `DashboardHandler` - reads the filtered iterator and renders the dashboard template
 
 **Excluded:**
+
 - Concrete widget implementations (each module provides its own)
 - Widget template markup (each module provides its own partial template)
 - ACL role / resource / privilege definitions (each module registers these via ACL events)
@@ -284,20 +286,24 @@ $app->get('/admin', [
 ## 5. Quality Attributes
 
 ### Security
+
 - Widget visibility is enforced by the ACL before the handler renders - a module widget is never sent to the template if the current user lacks the required resource/privilege. Filtering fails closed: without an authenticated, role-aware user, no widgets are shown.
 - `WidgetInterface` extends `ResourceInterface`, and the iterator passes each widget's `resourceId`/`privilege` directly to `isAllowed()` without string coercion.
 - Type safety is structural: `WidgetContainer` accepts only `WidgetInterface` instances via its constructor and `addWidget()`, and there is no other way to mutate its state - the filter cannot receive a non-widget item.
 
 ### Performance
+
 - The iterator is lazy - `FilterIterator::accept()` is called only when the template iterates; no up-front array construction of filtered results.
 - `WidgetContainer::addWidget()` performs one `usort` per insertion (widget counts are small), so `getIterator()` is a plain, cheap `ArrayIterator` copy.
 
 ### Extensibility
+
 - Any module can contribute widgets by registering a single PSR-14 listener. No modification to `webware-admin` is required.
 - Widget ordering is controlled by each widget's `$order` value - no central registration or priority numbering.
 - Each widget fully owns its template; the dashboard template is layout-only.
 
 ### Maintainability
+
 - `DashboardMiddleware` has two injected dependencies (`EventDispatcherInterface`, `AclInterface`) - both are interfaces, fully testable with mocks.
 - `AclWidgetFilterIterator` delegates all ACL logic to `AclInterface::isAllowed()` - no ACL implementation leaks into the widget layer.
 
